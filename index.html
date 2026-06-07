@@ -34,8 +34,8 @@
     .error { background: #fee2e2; color: #991b1b; padding: 12px 16px; border-radius: 8px; margin-top: 16px; font-size: 14px; }
     .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; }
     .filter-bar input { flex: 1; }
-    #page-staff, #page-admin { display: none; }
-    #page-staff.active, #page-admin.active { display: block; }
+    #page-admin { display: none; }
+    #page-admin.active { display: block; }
     .loading { text-align: center; color: #aaa; padding: 20px; }
   </style>
 </head>
@@ -223,15 +223,17 @@
   }
 
   // リアルタイム同期
-  supabase.channel('shifts')
-    .on('postgres_changes', { event: '*', table: 'shift_requests' }, () => {
-      const adminVisible = document.getElementById('page-admin').classList.contains('active');
-      if (adminVisible) loadShifts();
-    })
-    .subscribe();
+  try {
+    supabase.channel('shifts')
+      .on('postgres_changes', { event: '*', table: 'shift_requests' }, () => {
+        const adminVisible = document.getElementById('page-admin').classList.contains('active');
+        if (adminVisible) loadShifts();
+      })
+      .subscribe();
+  } catch(e) { console.log('realtime error', e); }
 
-  // 初期表示
-  showPage('staff');
+  // ページ切替ボタンの初期状態
+  document.getElementById('btn-staff').classList.add('active');
 </script>
 </body>
 </html>
