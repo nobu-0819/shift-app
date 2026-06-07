@@ -2,219 +2,491 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>シフト管理システム</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f5f5f5; color: #333; }
-    header { background: #2563eb; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
-    header h1 { font-size: 18px; }
-    nav button { background: white; color: #2563eb; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; }
-    nav button.active { background: #1d4ed8; color: white; }
-    .container { max-width: 700px; margin: 24px auto; padding: 0 16px; }
-    .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px; }
-    h2 { font-size: 18px; margin-bottom: 16px; color: #1e3a8a; }
-    label { display: block; font-size: 14px; color: #555; margin-bottom: 4px; margin-top: 12px; }
-    input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; }
-    textarea { height: 80px; resize: vertical; }
-    .btn { display: block; width: 100%; padding: 14px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; }
-    .btn:hover { background: #1d4ed8; }
-    .btn-danger { background: #ef4444; }
-    .btn-danger:hover { background: #dc2626; }
-    .row { display: flex; gap: 12px; }
-    .row > div { flex: 1; }
-    .shift-item { border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; margin-bottom: 10px; }
-    .shift-item .staff-name { font-weight: bold; font-size: 15px; color: #1e3a8a; }
-    .shift-item .shift-detail { font-size: 14px; color: #555; margin-top: 4px; }
-    .shift-item .shift-note { font-size: 13px; color: #888; margin-top: 4px; font-style: italic; }
-    .badge { display: inline-block; background: #dbeafe; color: #1d4ed8; padding: 2px 10px; border-radius: 20px; font-size: 13px; margin-top: 6px; }
-    .empty { text-align: center; color: #aaa; padding: 40px 0; font-size: 15px; }
-    .success { background: #d1fae5; color: #065f46; padding: 12px 16px; border-radius: 8px; margin-top: 16px; font-size: 14px; }
-    .error { background: #fee2e2; color: #991b1b; padding: 12px 16px; border-radius: 8px; margin-top: 16px; font-size: 14px; }
-    .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; }
-    .filter-bar input { flex: 1; }
-    #page-admin { display: none; }
-    #page-admin.active { display: block; }
-    .loading { text-align: center; color: #aaa; padding: 20px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f0f4f8; color: #333; }
+
+    header { background: #2563eb; color: white; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    header h1 { font-size: 17px; font-weight: bold; }
+    .tab-btns { display: flex; gap: 6px; }
+    .tab-btn { background: rgba(255,255,255,0.2); color: white; border: none; padding: 7px 14px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: bold; }
+    .tab-btn.active { background: white; color: #2563eb; }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .container { max-width: 600px; margin: 0 auto; padding: 16px; }
+
+    /* カード */
+    .card { background: white; border-radius: 14px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 16px; }
+
+    /* 入力欄 */
+    label { display: block; font-size: 13px; color: #666; margin-bottom: 4px; margin-top: 14px; }
+    label:first-child { margin-top: 0; }
+    input[type="text"] { width: 100%; padding: 11px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 16px; outline: none; }
+    input[type="text"]:focus { border-color: #2563eb; }
+
+    /* 半月切替 */
+    .half-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .half-nav button { background: #f1f5f9; border: none; border-radius: 8px; padding: 8px 14px; font-size: 14px; cursor: pointer; color: #333; }
+    .half-nav button:active { background: #e2e8f0; }
+    .half-title { font-size: 15px; font-weight: bold; color: #1e3a8a; }
+
+    /* カレンダーグリッド */
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 16px; }
+    .cal-header { text-align: center; font-size: 12px; color: #888; padding: 4px 0; font-weight: bold; }
+    .cal-header.sun { color: #ef4444; }
+    .cal-header.sat { color: #3b82f6; }
+    .cal-day { text-align: center; padding: 10px 4px; border-radius: 8px; font-size: 15px; cursor: pointer; border: 2px solid transparent; user-select: none; position: relative; }
+    .cal-day:active { opacity: 0.7; }
+    .cal-day.empty { cursor: default; }
+    .cal-day.past { color: #ccc; cursor: default; }
+    .cal-day.sun { color: #ef4444; }
+    .cal-day.sat { color: #3b82f6; }
+    .cal-day.selected { background: #dbeafe; border-color: #2563eb; font-weight: bold; }
+    .cal-day.selected.sun { background: #fee2e2; border-color: #ef4444; }
+    .cal-day.today { background: #fef3c7; }
+    .cal-day .dot { width: 5px; height: 5px; background: #2563eb; border-radius: 50%; margin: 2px auto 0; }
+
+    /* 時間バー */
+    .time-slots-container { margin-top: 8px; }
+    .day-block { border: 1.5px solid #e2e8f0; border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
+    .day-block-header { background: #f8fafc; padding: 10px 14px; font-size: 14px; font-weight: bold; color: #1e3a8a; display: flex; justify-content: space-between; align-items: center; }
+    .day-block-header .remove-btn { background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer; padding: 0 4px; }
+    .time-bar-wrap { padding: 12px 14px; }
+    .time-labels { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-bottom: 4px; padding: 0 0; }
+    .time-bar { display: flex; height: 36px; border-radius: 6px; overflow: hidden; cursor: pointer; border: 1px solid #e2e8f0; user-select: none; touch-action: none; }
+    .time-slot { flex: 1; background: #f1f5f9; border-right: 1px solid #e2e8f0; transition: background 0.05s; }
+    .time-slot:last-child { border-right: none; }
+    .time-slot.filled { background: #2563eb; }
+    .time-slot.filled.dragging { background: #1d4ed8; }
+    .time-hint { font-size: 12px; color: #64748b; margin-top: 6px; text-align: center; }
+    .selected-range { font-size: 13px; color: #2563eb; font-weight: bold; margin-top: 6px; text-align: center; min-height: 20px; }
+
+    /* 提出ボタン */
+    .submit-btn { display: block; width: 100%; padding: 15px; background: #2563eb; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+    .submit-btn:active { background: #1d4ed8; }
+    .submit-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+
+    /* メッセージ */
+    .msg-success { background: #d1fae5; color: #065f46; padding: 12px 16px; border-radius: 10px; margin-top: 12px; font-size: 14px; }
+    .msg-error { background: #fee2e2; color: #991b1b; padding: 12px 16px; border-radius: 10px; margin-top: 12px; font-size: 14px; }
+
+    /* 管理者画面 */
+    .filter-row { display: flex; gap: 8px; margin-bottom: 14px; }
+    .filter-row input { flex: 1; padding: 10px 12px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 15px; }
+    .filter-row button { background: #f1f5f9; border: none; border-radius: 10px; padding: 10px 14px; font-size: 14px; cursor: pointer; }
+    .shift-item { border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 10px; }
+    .shift-name { font-weight: bold; font-size: 15px; color: #1e3a8a; }
+    .shift-detail { font-size: 14px; color: #555; margin-top: 4px; }
+    .shift-note { font-size: 13px; color: #94a3b8; margin-top: 4px; font-style: italic; }
+    .empty-msg { text-align: center; color: #aaa; padding: 40px 0; font-size: 15px; }
+    .loading-msg { text-align: center; color: #aaa; padding: 20px; }
+
+    .section-title { font-size: 16px; font-weight: bold; color: #1e3a8a; margin-bottom: 14px; }
+    .no-selection-msg { text-align: center; color: #94a3b8; font-size: 14px; padding: 20px 0; }
   </style>
 </head>
 <body>
 
 <header>
   <h1>📅 シフト管理システム</h1>
-  <nav>
-    <button id="btn-staff" onclick="showPage('staff')">スタッフ用</button>
-    <button id="btn-admin" onclick="showPage('admin')">管理者用</button>
-  </nav>
+  <div class="tab-btns">
+    <button class="tab-btn active" onclick="showPage('staff')">スタッフ用</button>
+    <button class="tab-btn" onclick="showPage('admin')">管理者用</button>
+  </div>
 </header>
 
-<!-- スタッフ用ページ -->
-<div id="page-staff" class="container">
-  <div class="card">
-    <h2>シフト希望を提出する</h2>
+<!-- スタッフ用 -->
+<div id="page-staff" class="page active">
+  <div class="container">
+    <div class="card">
+      <label>お名前</label>
+      <input type="text" id="staff-name" placeholder="例：山田 太郎" />
+    </div>
 
-    <label>お名前</label>
-    <input type="text" id="staff-name" placeholder="例：山田 太郎" />
+    <div class="card">
+      <div class="half-nav">
+        <button onclick="changeHalf(-1)">◀ 前へ</button>
+        <span class="half-title" id="half-title"></span>
+        <button onclick="changeHalf(1)">次へ ▶</button>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
 
-    <label>メールアドレス</label>
-    <input type="email" id="staff-email" placeholder="例：yamada@example.com" />
+    <div class="card" id="time-card">
+      <div class="section-title">⏰ 出勤可能時間を塗りつぶしてください</div>
+      <div class="time-slots-container" id="time-slots-container">
+        <div class="no-selection-msg">上のカレンダーで日付を選んでください</div>
+      </div>
+    </div>
 
-    <label>希望日</label>
-    <input type="date" id="shift-date" />
-
-    <label>開始時間</label>
-    <select id="shift-start"></select>
-
-    <label>終了時間</label>
-    <select id="shift-end"></select>
-
-    <label>備考（任意）</label>
-    <textarea id="shift-note" placeholder="例：午前中は別の予定があります"></textarea>
-
-    <button class="btn" onclick="submitShift()">シフトを提出する</button>
-    <div id="staff-message"></div>
+    <button class="submit-btn" onclick="submitShifts()" id="submit-btn">シフトを提出する</button>
+    <div id="staff-msg"></div>
   </div>
 </div>
 
-<!-- 管理者用ページ -->
-<div id="page-admin" class="container">
-  <div class="card">
-    <h2>提出されたシフト希望一覧</h2>
-    <div class="filter-bar">
-      <input type="date" id="filter-date" onchange="loadShifts()" />
-      <button class="btn" style="width:auto;margin-top:0;padding:10px 16px" onclick="clearFilter()">全て表示</button>
+<!-- 管理者用 -->
+<div id="page-admin" class="page">
+  <div class="container">
+    <div class="card">
+      <div class="section-title">📋 提出されたシフト希望</div>
+      <div class="filter-row">
+        <input type="date" id="filter-date" onchange="loadShifts()" placeholder="日付で絞り込み" />
+        <button onclick="clearFilter()">全て表示</button>
+      </div>
+      <div id="shift-list"><div class="loading-msg">読み込み中...</div></div>
     </div>
-    <div id="shift-list"><div class="loading">読み込み中...</div></div>
   </div>
 </div>
 
 <script>
-  // Supabase設定
   const SUPABASE_URL = 'https://ebgayoclmenbursqjiyz.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_gNqEPUSvmUJonjy-7kBuaA_46I4CM8b';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-  // 15分単位の時間リストを生成
-  function generateTimeOptions(selectEl) {
-    selectEl.innerHTML = '';
-    for (let h = 6; h <= 23; h++) {
-      for (let m = 0; m < 60; m += 15) {
-        const hh = String(h).padStart(2, '0');
-        const mm = String(m).padStart(2, '0');
-        const opt = document.createElement('option');
-        opt.value = `${hh}:${mm}`;
-        opt.textContent = `${hh}:${mm}`;
-        selectEl.appendChild(opt);
-      }
-    }
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImViZ2F5b2NsbWVuYnVyc3FqaXl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3ODk0MDYsImV4cCI6MjA5NjM2NTQwNn0.rbweZuhZ2K_vlbF6lQcmoxxIhbLshsWcYZgo27WvdlA';
+  let sb;
+  try {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  } catch(e) {
+    console.error('Supabase init error:', e);
   }
 
-  generateTimeOptions(document.getElementById('shift-start'));
-  generateTimeOptions(document.getElementById('shift-end'));
-  document.getElementById('shift-end').value = '18:00';
-
-  // 今日の日付をデフォルトに
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('shift-date').value = today;
-
-  // ページ切替
-  function showPage(page) {
-    document.getElementById('page-staff').classList.remove('active');
-    document.getElementById('page-admin').classList.remove('active');
-    document.getElementById('btn-staff').classList.remove('active');
-    document.getElementById('btn-admin').classList.remove('active');
-    document.getElementById('page-' + page).classList.add('active');
-    document.getElementById('btn-' + page).classList.add('active');
-    if (page === 'admin') loadShifts();
+  // ===== ページ切替 =====
+  function showPage(p) {
+    document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('page-' + p).classList.add('active');
+    document.querySelectorAll('.tab-btn')[p === 'staff' ? 0 : 1].classList.add('active');
+    if (p === 'admin') loadShifts();
   }
 
-  // シフト提出
-  async function submitShift() {
-    const name = document.getElementById('staff-name').value.trim();
-    const email = document.getElementById('staff-email').value.trim();
-    const date = document.getElementById('shift-date').value;
-    const start = document.getElementById('shift-start').value;
-    const end = document.getElementById('shift-end').value;
-    const note = document.getElementById('shift-note').value.trim();
-    const msgEl = document.getElementById('staff-message');
+  // ===== カレンダー =====
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  let currentHalfYear = today.getFullYear();
+  let currentHalfMonth = today.getMonth();
+  let currentHalf = today.getDate() <= 15 ? 0 : 1; // 0=前半, 1=後半
+  let selectedDates = {}; // { 'YYYY-MM-DD': [slot indices...] }
 
-    if (!name || !email || !date || !start || !end) {
-      msgEl.innerHTML = '<div class="error">すべての項目を入力してください。</div>';
-      return;
-    }
-    if (start >= end) {
-      msgEl.innerHTML = '<div class="error">終了時間は開始時間より後にしてください。</div>';
-      return;
-    }
+  const DOW = ['日','月','火','水','木','金','土'];
+  const HOUR_START = 6;
+  const HOUR_END = 23;
+  const SLOTS_PER_HOUR = 4;
+  const TOTAL_SLOTS = (HOUR_END - HOUR_START) * SLOTS_PER_HOUR;
 
-    // スタッフを登録 or 取得
-    let { data: existingStaff } = await supabase
-      .from('staff').select('id').eq('email', email).single();
+  function changeHalf(dir) {
+    currentHalf += dir;
+    if (currentHalf < 0) { currentHalf = 1; currentHalfMonth--; }
+    if (currentHalf > 1) { currentHalf = 0; currentHalfMonth++; }
+    if (currentHalfMonth < 0) { currentHalfMonth = 11; currentHalfYear--; }
+    if (currentHalfMonth > 11) { currentHalfMonth = 0; currentHalfYear++; }
+    renderCalendar();
+  }
 
-    let staffId;
-    if (existingStaff) {
-      staffId = existingStaff.id;
-    } else {
-      const { data: newStaff, error } = await supabase
-        .from('staff').insert({ name, email }).select('id').single();
-      if (error) {
-        msgEl.innerHTML = '<div class="error">エラーが発生しました。もう一度お試しください。</div>';
-        return;
-      }
-      staffId = newStaff.id;
-    }
+  function renderCalendar() {
+    const y = currentHalfYear, m = currentHalfMonth;
+    const startDay = currentHalf === 0 ? 1 : 16;
+    const endDay = currentHalf === 0 ? 15 : new Date(y, m+1, 0).getDate();
+    document.getElementById('half-title').textContent =
+      `${y}年${m+1}月 ${currentHalf === 0 ? '前半（1〜15日）' : '後半（16日〜）'}`;
 
-    // シフト希望を登録
-    const { error } = await supabase.from('shift_requests').insert({
-      staff_id: staffId,
-      date,
-      start_time: start,
-      end_time: end,
-      note
+    const grid = document.getElementById('cal-grid');
+    grid.innerHTML = '';
+    DOW.forEach((d, i) => {
+      const h = document.createElement('div');
+      h.className = 'cal-header' + (i===0?' sun':i===6?' sat':'');
+      h.textContent = d;
+      grid.appendChild(h);
     });
 
-    if (error) {
-      msgEl.innerHTML = '<div class="error">送信に失敗しました。もう一度お試しください。</div>';
-    } else {
-      msgEl.innerHTML = '<div class="success">✅ シフト希望を提出しました！</div>';
-      document.getElementById('shift-note').value = '';
+    const firstDate = new Date(y, m, startDay);
+    const firstDow = firstDate.getDay();
+    for (let i = 0; i < firstDow; i++) {
+      const blank = document.createElement('div');
+      blank.className = 'cal-day empty';
+      grid.appendChild(blank);
+    }
+
+    for (let d = startDay; d <= endDay; d++) {
+      const date = new Date(y, m, d);
+      const dateStr = toDateStr(date);
+      const dow = date.getDay();
+      const isPast = date < today;
+      const isToday = date.getTime() === today.getTime();
+      const isSelected = dateStr in selectedDates;
+
+      const cell = document.createElement('div');
+      cell.className = 'cal-day' +
+        (isPast ? ' past' : '') +
+        (isToday ? ' today' : '') +
+        (isSelected ? ' selected' : '') +
+        (dow===0 ? ' sun' : dow===6 ? ' sat' : '');
+      cell.textContent = d;
+
+      if (isSelected) {
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        cell.appendChild(dot);
+      }
+
+      if (!isPast) {
+        cell.addEventListener('click', () => toggleDate(dateStr));
+      }
+      grid.appendChild(cell);
     }
   }
 
-  // シフト一覧読み込み
+  function toDateStr(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth()+1).padStart(2,'0');
+    const d = String(date.getDate()).padStart(2,'0');
+    return `${y}-${m}-${d}`;
+  }
+
+  function toggleDate(dateStr) {
+    if (dateStr in selectedDates) {
+      delete selectedDates[dateStr];
+    } else {
+      selectedDates[dateStr] = new Array(TOTAL_SLOTS).fill(false);
+    }
+    renderCalendar();
+    renderTimeSlots();
+  }
+
+  // ===== 時間バー =====
+  function renderTimeSlots() {
+    const container = document.getElementById('time-slots-container');
+    const dates = Object.keys(selectedDates).sort();
+
+    if (dates.length === 0) {
+      container.innerHTML = '<div class="no-selection-msg">上のカレンダーで日付を選んでください</div>';
+      return;
+    }
+
+    container.innerHTML = '';
+    dates.forEach(dateStr => {
+      const d = new Date(dateStr + 'T00:00:00');
+      const dow = DOW[d.getDay()];
+      const label = `${d.getMonth()+1}/${d.getDate()}（${dow}）`;
+
+      const block = document.createElement('div');
+      block.className = 'day-block';
+      block.dataset.date = dateStr;
+
+      const header = document.createElement('div');
+      header.className = 'day-block-header';
+      header.innerHTML = `<span>${label}</span><button class="remove-btn" onclick="removeDate('${dateStr}')">×</button>`;
+      block.appendChild(header);
+
+      const wrap = document.createElement('div');
+      wrap.className = 'time-bar-wrap';
+
+      // 時刻ラベル
+      const labels = document.createElement('div');
+      labels.className = 'time-labels';
+      for (let h = HOUR_START; h <= HOUR_END; h += 2) {
+        const span = document.createElement('span');
+        span.textContent = `${h}時`;
+        labels.appendChild(span);
+      }
+      wrap.appendChild(labels);
+
+      // 時間バー
+      const bar = document.createElement('div');
+      bar.className = 'time-bar';
+      bar.dataset.date = dateStr;
+
+      for (let i = 0; i < TOTAL_SLOTS; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'time-slot' + (selectedDates[dateStr][i] ? ' filled' : '');
+        slot.dataset.index = i;
+        bar.appendChild(slot);
+      }
+
+      setupBarEvents(bar, dateStr);
+      wrap.appendChild(bar);
+
+      const rangeEl = document.createElement('div');
+      rangeEl.className = 'selected-range';
+      rangeEl.id = `range-${dateStr}`;
+      updateRangeText(dateStr, rangeEl);
+      wrap.appendChild(rangeEl);
+
+      const hint = document.createElement('div');
+      hint.className = 'time-hint';
+      hint.textContent = 'タップまたはドラッグで出勤可能時間を塗りつぶしてください';
+      wrap.appendChild(hint);
+
+      block.appendChild(wrap);
+      container.appendChild(block);
+    });
+  }
+
+  function removeDate(dateStr) {
+    delete selectedDates[dateStr];
+    renderCalendar();
+    renderTimeSlots();
+  }
+
+  function setupBarEvents(bar, dateStr) {
+    let isDragging = false;
+    let fillMode = true;
+    let lastIndex = -1;
+
+    function getSlotIndex(e) {
+      const rect = bar.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const ratio = (clientX - rect.left) / rect.width;
+      return Math.max(0, Math.min(TOTAL_SLOTS-1, Math.floor(ratio * TOTAL_SLOTS)));
+    }
+
+    function applySlot(idx) {
+      if (idx === lastIndex) return;
+      lastIndex = idx;
+      selectedDates[dateStr][idx] = fillMode;
+      const slots = bar.querySelectorAll('.time-slot');
+      slots[idx].className = 'time-slot' + (fillMode ? ' filled' : '');
+      updateRangeText(dateStr);
+    }
+
+    bar.addEventListener('mousedown', e => {
+      e.preventDefault();
+      isDragging = true;
+      lastIndex = -1;
+      const idx = getSlotIndex(e);
+      fillMode = !selectedDates[dateStr][idx];
+      applySlot(idx);
+    });
+    window.addEventListener('mousemove', e => { if (isDragging) applySlot(getSlotIndex(e)); });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    bar.addEventListener('touchstart', e => {
+      e.preventDefault();
+      isDragging = true;
+      lastIndex = -1;
+      const idx = getSlotIndex(e);
+      fillMode = !selectedDates[dateStr][idx];
+      applySlot(idx);
+    }, { passive: false });
+    bar.addEventListener('touchmove', e => {
+      e.preventDefault();
+      if (isDragging) applySlot(getSlotIndex(e));
+    }, { passive: false });
+    bar.addEventListener('touchend', () => { isDragging = false; });
+  }
+
+  function slotToTime(idx) {
+    const totalMins = HOUR_START * 60 + idx * 15;
+    const h = Math.floor(totalMins / 60);
+    const m = totalMins % 60;
+    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+  }
+
+  function updateRangeText(dateStr, el) {
+    const rangeEl = el || document.getElementById(`range-${dateStr}`);
+    if (!rangeEl) return;
+    const slots = selectedDates[dateStr];
+    if (!slots) return;
+
+    const filled = slots.map((v,i) => v ? i : -1).filter(i => i >= 0);
+    if (filled.length === 0) {
+      rangeEl.textContent = '';
+      return;
+    }
+    const start = slotToTime(filled[0]);
+    const end = slotToTime(filled[filled.length-1] + 1);
+    rangeEl.textContent = `✅ ${start} 〜 ${end}`;
+  }
+
+  // ===== 提出 =====
+  async function submitShifts() {
+    const name = document.getElementById('staff-name').value.trim();
+    const msgEl = document.getElementById('staff-msg');
+    msgEl.innerHTML = '';
+
+    if (!name) { msgEl.innerHTML = '<div class="msg-error">お名前を入力してください。</div>'; return; }
+
+    const dates = Object.keys(selectedDates).filter(d => selectedDates[d].some(v => v));
+    if (dates.length === 0) { msgEl.innerHTML = '<div class="msg-error">日付と出勤可能時間を選んでください。</div>'; return; }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = '送信中...';
+
+    try {
+      // スタッフ取得 or 作成
+      let { data: existing } = await sb.from('staff').select('id').eq('name', name).maybeSingle();
+      let staffId;
+      if (existing) {
+        staffId = existing.id;
+      } else {
+        const { data: newS, error } = await sb.from('staff').insert({ name }).select('id').single();
+        if (error) throw error;
+        staffId = newS.id;
+      }
+
+      // 各日のシフトを登録
+      for (const dateStr of dates) {
+        const slots = selectedDates[dateStr];
+        const filled = slots.map((v,i) => v ? i : -1).filter(i => i >= 0);
+        if (filled.length === 0) continue;
+        const startTime = slotToTime(filled[0]);
+        const endTime = slotToTime(filled[filled.length-1] + 1);
+        const { error } = await sb.from('shift_requests').insert({
+          staff_id: staffId, date: dateStr, start_time: startTime, end_time: endTime
+        });
+        if (error) throw error;
+      }
+
+      msgEl.innerHTML = `<div class="msg-success">✅ ${dates.length}日分のシフトを提出しました！</div>`;
+      selectedDates = {};
+      document.getElementById('staff-name').value = '';
+      renderCalendar();
+      renderTimeSlots();
+    } catch(e) {
+      console.error(e);
+      msgEl.innerHTML = '<div class="msg-error">送信に失敗しました。時間をおいて再試行してください。</div>';
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'シフトを提出する';
+  }
+
+  // ===== 管理者：シフト一覧 =====
   async function loadShifts() {
     const listEl = document.getElementById('shift-list');
     const filterDate = document.getElementById('filter-date').value;
-    listEl.innerHTML = '<div class="loading">読み込み中...</div>';
+    listEl.innerHTML = '<div class="loading-msg">読み込み中...</div>';
 
-    let query = supabase
-      .from('shift_requests')
-      .select('*, staff(name, email)')
-      .order('date', { ascending: true })
-      .order('start_time', { ascending: true });
+    try {
+      let q = sb.from('shift_requests')
+        .select('*, staff(name)')
+        .order('date', { ascending: true })
+        .order('start_time', { ascending: true });
+      if (filterDate) q = q.eq('date', filterDate);
 
-    if (filterDate) query = query.eq('date', filterDate);
+      const { data, error } = await q;
+      if (error) throw error;
 
-    const { data, error } = await query;
+      if (!data || data.length === 0) {
+        listEl.innerHTML = '<div class="empty-msg">提出されたシフトはありません。</div>';
+        return;
+      }
 
-    if (error || !data) {
-      listEl.innerHTML = '<div class="error">データの読み込みに失敗しました。</div>';
-      return;
+      listEl.innerHTML = data.map(s => {
+        const d = new Date(s.date + 'T00:00:00');
+        const dow = DOW[d.getDay()];
+        return `<div class="shift-item">
+          <div class="shift-name">👤 ${s.staff?.name || '不明'}</div>
+          <div class="shift-detail">📅 ${s.date}（${dow}） ｜ 🕐 ${s.start_time.slice(0,5)} 〜 ${s.end_time.slice(0,5)}</div>
+        </div>`;
+      }).join('');
+    } catch(e) {
+      console.error(e);
+      listEl.innerHTML = '<div class="msg-error">データの読み込みに失敗しました。</div>';
     }
-    if (data.length === 0) {
-      listEl.innerHTML = '<div class="empty">提出されたシフトはありません。</div>';
-      return;
-    }
-
-    listEl.innerHTML = data.map(s => `
-      <div class="shift-item">
-        <div class="staff-name">👤 ${s.staff?.name || '不明'}</div>
-        <div class="shift-detail">📅 ${s.date} ｜ 🕐 ${s.start_time.slice(0,5)} 〜 ${s.end_time.slice(0,5)}</div>
-        ${s.note ? `<div class="shift-note">💬 ${s.note}</div>` : ''}
-        <span class="badge">${s.staff?.email || ''}</span>
-      </div>
-    `).join('');
   }
 
   function clearFilter() {
@@ -224,16 +496,16 @@
 
   // リアルタイム同期
   try {
-    supabase.channel('shifts')
+    sb.channel('shifts')
       .on('postgres_changes', { event: '*', table: 'shift_requests' }, () => {
-        const adminVisible = document.getElementById('page-admin').classList.contains('active');
-        if (adminVisible) loadShifts();
+        if (document.getElementById('page-admin').classList.contains('active')) loadShifts();
       })
       .subscribe();
-  } catch(e) { console.log('realtime error', e); }
+  } catch(e) {}
 
-  // ページ切替ボタンの初期状態
-  document.getElementById('btn-staff').classList.add('active');
+  // 初期化
+  renderCalendar();
+  renderTimeSlots();
 </script>
 </body>
 </html>
