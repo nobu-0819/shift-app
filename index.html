@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>シフト管理システム</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f5f5f5; color: #333; }
+    header { background: #2563eb; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { font-size: 18px; }
+    nav button { background: white; color: #2563eb; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; }
+    nav button.active { background: #1d4ed8; color: white; }
+    .container { max-width: 700px; margin: 24px auto; padding: 0 16px; }
+    .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px; }
+    h2 { font-size: 18px; margin-bottom: 16px; color: #1e3a8a; }
+    label { display: block; font-size: 14px; color: #555; margin-bottom: 4px; margin-top: 12px; }
+    input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; }
+    textarea { height: 80px; resize: vertical; }
+    .btn { display: block; width: 100%; padding: 14px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+    .btn:hover { background: #1d4ed8; }
+    .btn-danger { background: #ef4444; }
+    .btn-danger:hover { background: #dc2626; }
+    .row { display: flex; gap: 12px; }
+    .row > div { flex: 1; }
+    .shift-item { border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; margin-bottom: 10px; }
+    .shift-item .staff-name { font-weight: bold; font-size: 15px; color: #1e3a8a; }
+    .shift-item .shift-detail { font-size: 14px; color: #555; margin-top: 4px; }
+    .shift-item .shift-note { font-size: 13px; color: #888; margin-top: 4px; font-style: italic; }
+    .badge { display: inline-block; background: #dbeafe; color: #1d4ed8; padding: 2px 10px; border-radius: 20px; font-size: 13px; margin-top: 6px; }
+    .empty { text-align: center; color: #aaa; padding: 40px 0; font-size: 15px; }
+    .success { background: #d1fae5; color: #065f46; padding: 12px 16px; border-radius: 8px; margin-top: 16px; font-size: 14px; }
+    .error { background: #fee2e2; color: #991b1b; padding: 12px 16px; border-radius: 8px; margin-top: 16px; font-size: 14px; }
+    .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; }
+    .filter-bar input { flex: 1; }
+    #page-staff, #page-admin { display: none; }
+    #page-staff.active, #page-admin.active { display: block; }
+    .loading { text-align: center; color: #aaa; padding: 20px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📅 シフト管理システム</h1>
+  <nav>
+    <button id="btn-staff" onclick="showPage('staff')">スタッフ用</button>
+    <button id="btn-admin" onclick="showPage('admin')">管理者用</button>
+  </nav>
+</header>
+
+<!-- スタッフ用ページ -->
+<div id="page-staff" class="container">
+  <div class="card">
+    <h2>シフト希望を提出する</h2>
+
+    <label>お名前</label>
+    <input type="text" id="staff-name" placeholder="例：山田 太郎" />
+
+    <label>メールアドレス</label>
+    <input type="email" id="staff-email" placeholder="例：yamada@example.com" />
+
+    <label>希望日</label>
+    <input type="date" id="shift-date" />
+
+    <label>開始時間</label>
+    <select id="shift-start"></select>
+
+    <label>終了時間</label>
+    <select id="shift-end"></select>
+
+    <label>備考（任意）</label>
+    <textarea id="shift-note" placeholder="例：午前中は別の予定があります"></textarea>
+
+    <button class="btn" onclick="submitShift()">シフトを提出する</button>
+    <div id="staff-message"></div>
+  </div>
+</div>
+
+<!-- 管理者用ページ -->
+<div id="page-admin" class="container">
+  <div class="card">
+    <h2>提出されたシフト希望一覧</h2>
+    <div class="filter-bar">
+      <input type="date" id="filter-date" onchange="loadShifts()" />
+      <button class="btn" style="width:auto;margin-top:0;padding:10px 16px" onclick="clearFilter()">全て表示</button>
+    </div>
+    <div id="shift-list"><div class="loading">読み込み中...</div></div>
+  </div>
+</div>
+
+<script>
+  // Supabase設定
+  const SUPABASE_URL = 'https://ebgayoclmenbursqjiyz.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_gNqEPUSvmUJonjy-7kBuaA_46I4CM8b';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // 15分単位の時間リストを生成
+  function generateTimeOptions(selectEl) {
+    selectEl.innerHTML = '';
+    for (let h = 6; h <= 23; h++) {
+      for (let m = 0; m < 60; m += 15) {
+        const hh = String(h).padStart(2, '0');
+        const mm = String(m).padStart(2, '0');
+        const opt = document.createElement('option');
+        opt.value = `${hh}:${mm}`;
+        opt.textContent = `${hh}:${mm}`;
+        selectEl.appendChild(opt);
+      }
+    }
+  }
+
+  generateTimeOptions(document.getElementById('shift-start'));
+  generateTimeOptions(document.getElementById('shift-end'));
+  document.getElementById('shift-end').value = '18:00';
+
+  // 今日の日付をデフォルトに
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('shift-date').value = today;
+
+  // ページ切替
+  function showPage(page) {
+    document.getElementById('page-staff').classList.remove('active');
+    document.getElementById('page-admin').classList.remove('active');
+    document.getElementById('btn-staff').classList.remove('active');
+    document.getElementById('btn-admin').classList.remove('active');
+    document.getElementById('page-' + page).classList.add('active');
+    document.getElementById('btn-' + page).classList.add('active');
+    if (page === 'admin') loadShifts();
+  }
+
+  // シフト提出
+  async function submitShift() {
+    const name = document.getElementById('staff-name').value.trim();
+    const email = document.getElementById('staff-email').value.trim();
+    const date = document.getElementById('shift-date').value;
+    const start = document.getElementById('shift-start').value;
+    const end = document.getElementById('shift-end').value;
+    const note = document.getElementById('shift-note').value.trim();
+    const msgEl = document.getElementById('staff-message');
+
+    if (!name || !email || !date || !start || !end) {
+      msgEl.innerHTML = '<div class="error">すべての項目を入力してください。</div>';
+      return;
+    }
+    if (start >= end) {
+      msgEl.innerHTML = '<div class="error">終了時間は開始時間より後にしてください。</div>';
+      return;
+    }
+
+    // スタッフを登録 or 取得
+    let { data: existingStaff } = await supabase
+      .from('staff').select('id').eq('email', email).single();
+
+    let staffId;
+    if (existingStaff) {
+      staffId = existingStaff.id;
+    } else {
+      const { data: newStaff, error } = await supabase
+        .from('staff').insert({ name, email }).select('id').single();
+      if (error) {
+        msgEl.innerHTML = '<div class="error">エラーが発生しました。もう一度お試しください。</div>';
+        return;
+      }
+      staffId = newStaff.id;
+    }
+
+    // シフト希望を登録
+    const { error } = await supabase.from('shift_requests').insert({
+      staff_id: staffId,
+      date,
+      start_time: start,
+      end_time: end,
+      note
+    });
+
+    if (error) {
+      msgEl.innerHTML = '<div class="error">送信に失敗しました。もう一度お試しください。</div>';
+    } else {
+      msgEl.innerHTML = '<div class="success">✅ シフト希望を提出しました！</div>';
+      document.getElementById('shift-note').value = '';
+    }
+  }
+
+  // シフト一覧読み込み
+  async function loadShifts() {
+    const listEl = document.getElementById('shift-list');
+    const filterDate = document.getElementById('filter-date').value;
+    listEl.innerHTML = '<div class="loading">読み込み中...</div>';
+
+    let query = supabase
+      .from('shift_requests')
+      .select('*, staff(name, email)')
+      .order('date', { ascending: true })
+      .order('start_time', { ascending: true });
+
+    if (filterDate) query = query.eq('date', filterDate);
+
+    const { data, error } = await query;
+
+    if (error || !data) {
+      listEl.innerHTML = '<div class="error">データの読み込みに失敗しました。</div>';
+      return;
+    }
+    if (data.length === 0) {
+      listEl.innerHTML = '<div class="empty">提出されたシフトはありません。</div>';
+      return;
+    }
+
+    listEl.innerHTML = data.map(s => `
+      <div class="shift-item">
+        <div class="staff-name">👤 ${s.staff?.name || '不明'}</div>
+        <div class="shift-detail">📅 ${s.date} ｜ 🕐 ${s.start_time.slice(0,5)} 〜 ${s.end_time.slice(0,5)}</div>
+        ${s.note ? `<div class="shift-note">💬 ${s.note}</div>` : ''}
+        <span class="badge">${s.staff?.email || ''}</span>
+      </div>
+    `).join('');
+  }
+
+  function clearFilter() {
+    document.getElementById('filter-date').value = '';
+    loadShifts();
+  }
+
+  // リアルタイム同期
+  supabase.channel('shifts')
+    .on('postgres_changes', { event: '*', table: 'shift_requests' }, () => {
+      const adminVisible = document.getElementById('page-admin').classList.contains('active');
+      if (adminVisible) loadShifts();
+    })
+    .subscribe();
+
+  // 初期表示
+  showPage('staff');
+</script>
+</body>
+</html>
