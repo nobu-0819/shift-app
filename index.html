@@ -7,7 +7,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f0f4f8; color: #333; font-size: 15px; }
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f0f4f8; color: #333; font-size: 15px; overscroll-behavior: none; }
 
     header { background: #1d4ed8; color: white; padding: 13px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
     header h1 { font-size: 16px; font-weight: bold; }
@@ -358,9 +358,14 @@ function showAdminTab(tab) {
   if (tab === 'deadline') loadDeadlineList();
 }
 
+// ====== 全角→半角変換 ======
+function toHalf(str) {
+  return str.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0)).trim();
+}
+
 // ====== 認証フロー ======
 async function stepCode() {
-  const code = document.getElementById('input-code').value.trim();
+  const code = toHalf(document.getElementById('input-code').value);
   const msgEl = document.getElementById('msg-code');
   if (!code) { msgEl.innerHTML = '<div class="msg-error">コードを入力してください</div>'; return; }
 
@@ -381,8 +386,8 @@ async function stepCode() {
 }
 
 async function stepSetPin() {
-  const pin1 = document.getElementById('input-pin-set').value.trim();
-  const pin2 = document.getElementById('input-pin-confirm').value.trim();
+  const pin1 = toHalf(document.getElementById('input-pin-set').value);
+  const pin2 = toHalf(document.getElementById('input-pin-confirm').value);
   const msgEl = document.getElementById('msg-set-pin');
 
   if (pin1.length !== 4 || !/^\d+$/.test(pin1)) { msgEl.innerHTML = '<div class="msg-error">PINは4桁の数字で入力してください</div>'; return; }
@@ -396,7 +401,7 @@ async function stepSetPin() {
 }
 
 async function stepPin() {
-  const pin = document.getElementById('input-pin').value.trim();
+  const pin = toHalf(document.getElementById('input-pin').value);
   const msgEl = document.getElementById('msg-pin');
 
   if (!pin) { msgEl.innerHTML = '<div class="msg-error">PINを入力してください</div>'; return; }
@@ -407,8 +412,11 @@ async function stepPin() {
 
 async function completeLogin(staff) {
   currentStaff = staff;
+  // ログイン状態をlocalStorageに保存
+  localStorage.setItem('shift_staff_id', staff.id);
   document.getElementById('card-set-pin').style.display = 'none';
   document.getElementById('card-pin').style.display = 'none';
+  document.getElementById('card-code').style.display = 'none';
   document.getElementById('staff-main').style.display = 'block';
   document.getElementById('staff-greeting').textContent = `👋 こんにちは、${staff.name} さん`;
 
@@ -431,6 +439,7 @@ function resetToCode() {
 function logout() {
   currentStaff = null; tempStaff = null;
   selectedDates = {}; submittedDates = {};
+  localStorage.removeItem('shift_staff_id');
   document.getElementById('staff-main').style.display = 'none';
   document.getElementById('card-code').style.display = 'block';
   document.getElementById('input-code').value = '';
@@ -439,9 +448,9 @@ function logout() {
 
 // ====== PIN変更 ======
 async function changePin() {
-  const cur = document.getElementById('pin-current').value.trim();
-  const n1 = document.getElementById('pin-new').value.trim();
-  const n2 = document.getElementById('pin-new-confirm').value.trim();
+  const cur = toHalf(document.getElementById('pin-current').value);
+  const n1 = toHalf(document.getElementById('pin-new').value);
+  const n2 = toHalf(document.getElementById('pin-new-confirm').value);
   const msgEl = document.getElementById('pin-change-msg');
 
   if (cur !== currentStaff.pin) { msgEl.innerHTML = '<div class="msg-error">現在のPINが違います</div>'; return; }
@@ -834,7 +843,7 @@ function clearAdminFilter() { document.getElementById('admin-filter-date').value
 // ====== 管理者：スタッフ管理 ======
 async function registerStaff() {
   const name = document.getElementById('new-staff-name').value.trim();
-  const code = document.getElementById('new-staff-code').value.trim();
+  const code = toHalf(document.getElementById('new-staff-code').value);
   const msgEl = document.getElementById('staff-register-msg');
   if (!name || !code) { msgEl.innerHTML = '<div class="msg-error">名前とコードを入力してください。</div>'; return; }
   const { error } = await sb.from('staff').insert({ name, code });
@@ -908,6 +917,19 @@ async function deleteDeadline(id) {
 function toDateStr(date) {
   return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
 }
+
+// ページ読み込み時に自動ログイン復元
+(async () => {
+  const savedId = localStorage.getItem('shift_staff_id');
+  if (savedId) {
+    const { data } = await sb.from('staff').select('*').eq('id', savedId).maybeSingle();
+    if (data) {
+      await completeLogin(data);
+      return;
+    }
+    localStorage.removeItem('shift_staff_id');
+  }
+})();
 
 // Enterキー対応
 document.getElementById('input-code').addEventListener('keydown', e => { if (e.key==='Enter') stepCode(); });
