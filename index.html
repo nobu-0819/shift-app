@@ -198,6 +198,12 @@
       <div id="staff-tab-input">
         <div id="deadline-banner" class="deadline-banner normal">📅 読み込み中...</div>
         <div class="card">
+          <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#0369a1;line-height:1.6">
+            📌 <strong>操作手順</strong><br>
+            ① 出勤できる日付をタップして選択（複数選択可）<br>
+            ② 下に表示される時間バーを指でなぞって出勤可能時間を塗りつぶす<br>
+            ③「シフトを提出する」ボタンで送信
+          </div>
           <div class="half-nav">
             <button onclick="changeHalf(-1)">◀</button>
             <span class="half-title" id="half-title"></span>
@@ -454,15 +460,14 @@ async function changePin() {
 
 // ====== カレンダー期間の自動選択 ======
 async function initCalendarPeriod() {
-  // 今日がどの半月期間か
   const y = today.getFullYear(), m = today.getMonth(), d = today.getDate();
   let half = d <= 15 ? 0 : 1;
   let year = y, month = m;
 
-  // 現在期間の締切を確認
-  const dl = await getDeadlineForPeriod(year, month, half);
-  if (dl && today > dl) {
-    // 締切が過ぎていれば次の半月へ
+  // 期限が過ぎていない期間が見つかるまで最大12回（6ヶ月分）進める
+  for (let i = 0; i < 12; i++) {
+    const dl = await getDeadlineForPeriod(year, month, half);
+    if (dl && today <= dl) break;
     half++;
     if (half > 1) { half = 0; month++; }
     if (month > 11) { month = 0; year++; }
