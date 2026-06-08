@@ -9,46 +9,44 @@
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f0f4f8; color: #333; font-size: 15px; }
 
-    /* ヘッダー */
     header { background: #1d4ed8; color: white; padding: 13px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
     header h1 { font-size: 16px; font-weight: bold; }
     .tab-btns { display: flex; gap: 6px; }
-    .tab-btn { background: rgba(255,255,255,0.2); color: white; border: none; padding: 7px 14px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: bold; transition: background 0.2s; }
+    .tab-btn { background: rgba(255,255,255,0.2); color: white; border: none; padding: 7px 14px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: bold; }
     .tab-btn.active { background: white; color: #1d4ed8; }
 
-    /* ページ */
     .page { display: none; }
     .page.active { display: block; }
     .container { max-width: 640px; margin: 0 auto; padding: 16px; }
 
-    /* カード */
     .card { background: white; border-radius: 14px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); margin-bottom: 14px; }
 
     /* 期限バナー */
-    .deadline-banner { border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: bold; }
+    .deadline-banner { border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; font-size: 14px; font-weight: bold; }
     .deadline-banner.danger { background: #fee2e2; color: #991b1b; border: 2px solid #fca5a5; }
     .deadline-banner.warning { background: #fff7ed; color: #9a3412; border: 2px solid #fdba74; }
     .deadline-banner.normal { background: #eff6ff; color: #1e40af; border: 2px solid #93c5fd; }
     .deadline-banner.over { background: #f1f5f9; color: #94a3b8; border: 2px solid #e2e8f0; }
 
-    /* コード入力 */
-    .code-box { text-align: center; padding: 10px 0; }
-    .code-box p { color: #64748b; margin-bottom: 16px; font-size: 14px; }
-    .code-input { font-size: 28px; letter-spacing: 6px; text-align: center; width: 180px; padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none; }
-    .code-input:focus { border-color: #1d4ed8; }
-    .code-btn { margin-top: 14px; padding: 13px 40px; background: #1d4ed8; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; }
-    .code-btn:active { background: #1e40af; }
+    /* ログイン */
+    .auth-box { text-align: center; padding: 8px 0; }
+    .auth-box p { color: #64748b; margin-bottom: 16px; font-size: 14px; }
+    .auth-input { font-size: 24px; letter-spacing: 4px; text-align: center; width: 200px; padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none; display: block; margin: 0 auto 14px; }
+    .auth-input:focus { border-color: #1d4ed8; }
+    .auth-btn { padding: 13px 40px; background: #1d4ed8; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    .auth-btn:active { background: #1e40af; }
     .staff-greeting { background: #eff6ff; border-radius: 10px; padding: 12px 16px; margin-top: 14px; font-size: 15px; color: #1e40af; font-weight: bold; text-align: center; }
+    .logout-btn { display: block; width: 100%; margin-top: 8px; padding: 10px; background: #f1f5f9; color: #64748b; border: none; border-radius: 10px; font-size: 14px; cursor: pointer; }
 
     /* サブタブ */
     .sub-tabs { display: flex; background: #f1f5f9; border-radius: 10px; padding: 4px; margin-bottom: 14px; gap: 4px; }
-    .sub-tab { flex: 1; text-align: center; padding: 9px; border: none; background: transparent; border-radius: 8px; font-size: 14px; cursor: pointer; color: #64748b; font-weight: bold; }
+    .sub-tab { flex: 1; text-align: center; padding: 9px; border: none; background: transparent; border-radius: 8px; font-size: 13px; cursor: pointer; color: #64748b; font-weight: bold; }
     .sub-tab.active { background: white; color: #1d4ed8; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
 
     /* カレンダー */
     .half-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
     .half-nav button { background: #f1f5f9; border: none; border-radius: 8px; padding: 8px 14px; font-size: 14px; cursor: pointer; }
-    .half-title { font-size: 15px; font-weight: bold; color: #1e3a8a; }
+    .half-title { font-size: 14px; font-weight: bold; color: #1e3a8a; }
     .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
     .cal-header { text-align: center; font-size: 11px; color: #94a3b8; padding: 4px 0; font-weight: bold; }
     .cal-header.sun { color: #ef4444; }
@@ -61,26 +59,25 @@
     .cal-day.sat { color: #3b82f6; }
     .cal-day.selected { background: #dbeafe; border-color: #1d4ed8; font-weight: bold; }
     .cal-day.today { font-weight: bold; text-decoration: underline; }
-    .cal-day .dot { width: 5px; height: 5px; background: #1d4ed8; border-radius: 50%; margin: 2px auto 0; }
+    .cal-day .dot { width: 5px; height: 5px; border-radius: 50%; margin: 2px auto 0; }
+    .cal-day .dot.new { background: #1d4ed8; }
     .cal-day .dot.submitted { background: #10b981; }
 
     /* 時間バー */
     .day-block { border: 1.5px solid #e2e8f0; border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
     .day-block-header { background: #f8fafc; padding: 10px 14px; font-size: 14px; font-weight: bold; color: #1e3a8a; display: flex; justify-content: space-between; align-items: center; }
-    .remove-btn { background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; padding: 0 4px; line-height: 1; }
+    .remove-btn { background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; padding: 0 4px; }
     .time-bar-wrap { padding: 12px 14px; }
     .time-labels { display: flex; justify-content: space-between; font-size: 10px; color: #94a3b8; margin-bottom: 4px; }
-    .time-bar { display: flex; height: 40px; border-radius: 8px; overflow: hidden; cursor: pointer; border: 1px solid #e2e8f0; user-select: none; touch-action: none; }
-    .time-slot { flex: 1; background: #f1f5f9; border-right: 1px solid #e8ecf0; }
+    .time-bar { display: flex; height: 44px; border-radius: 8px; overflow: hidden; cursor: pointer; border: 1px solid #e2e8f0; user-select: none; touch-action: none; }
+    .time-slot { flex: 1; background: #f1f5f9; border-right: 1px solid #e8ecf0; transition: background 0.05s; }
     .time-slot:last-child { border-right: none; }
     .time-slot.filled { background: #2563eb; }
-    .time-slot.submitted { background: #10b981; }
-    .time-slot.filled.submitted { background: #2563eb; }
-    .selected-range { font-size: 13px; color: #2563eb; font-weight: bold; margin-top: 6px; text-align: center; min-height: 18px; }
-    .time-hint { font-size: 11px; color: #94a3b8; margin-top: 4px; text-align: center; }
+    .time-slot.submitted-bg { background: #bbf7d0; }
+    .selected-range { font-size: 12px; color: #2563eb; font-weight: bold; margin-top: 6px; min-height: 18px; }
+    .time-hint { font-size: 11px; color: #94a3b8; margin-top: 4px; }
     .no-sel-msg { text-align: center; color: #94a3b8; font-size: 14px; padding: 20px 0; }
 
-    /* 凡例 */
     .legend { display: flex; gap: 16px; font-size: 12px; color: #64748b; margin-bottom: 10px; }
     .legend-item { display: flex; align-items: center; gap: 5px; }
     .legend-dot { width: 12px; height: 12px; border-radius: 3px; }
@@ -89,8 +86,6 @@
     .primary-btn { display: block; width: 100%; padding: 15px; background: #1d4ed8; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; }
     .primary-btn:active { background: #1e40af; }
     .primary-btn:disabled { background: #94a3b8; cursor: not-allowed; }
-    .danger-btn { background: #ef4444; }
-    .danger-btn:active { background: #dc2626; }
 
     /* メッセージ */
     .msg-success { background: #d1fae5; color: #065f46; padding: 12px 16px; border-radius: 10px; margin-top: 10px; font-size: 14px; }
@@ -99,48 +94,45 @@
     /* 提出済み一覧 */
     .submitted-item { border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 13px 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
     .submitted-item .date-label { font-weight: bold; color: #1e3a8a; font-size: 14px; }
-    .submitted-item .time-label { font-size: 13px; color: #10b981; font-weight: bold; }
-    .del-btn { background: none; border: 1.5px solid #fca5a5; color: #ef4444; border-radius: 8px; padding: 5px 10px; font-size: 12px; cursor: pointer; white-space: nowrap; }
+    .submitted-item .time-label { font-size: 13px; color: #10b981; font-weight: bold; margin-top: 2px; }
+    .del-btn { background: none; border: 1.5px solid #fca5a5; color: #ef4444; border-radius: 8px; padding: 5px 10px; font-size: 12px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
 
-    /* 管理者：スタッフ登録 */
-    .form-row { display: flex; gap: 10px; }
-    .form-row input { flex: 1; padding: 10px 12px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 15px; outline: none; }
-    .form-row input:focus { border-color: #1d4ed8; }
-    .form-row button { padding: 10px 18px; background: #1d4ed8; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; white-space: nowrap; }
-    .staff-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; margin-bottom: 8px; }
-    .staff-list-item .info { font-size: 14px; }
-    .staff-list-item .code-badge { font-size: 13px; color: #64748b; background: #f1f5f9; padding: 3px 10px; border-radius: 6px; font-weight: bold; margin-left: 8px; }
-
-    /* 管理者：シフト一覧（日付グループ） */
-    .date-group { margin-bottom: 14px; }
-    .date-group-header { background: #1d4ed8; color: white; padding: 8px 14px; border-radius: 10px 10px 0 0; font-size: 14px; font-weight: bold; }
-    .date-group-body { border: 1.5px solid #e2e8f0; border-top: none; border-radius: 0 0 10px 10px; overflow: hidden; }
-    .shift-row { display: flex; align-items: center; padding: 10px 14px; border-bottom: 1px solid #f1f5f9; gap: 10px; }
-    .shift-row:last-child { border-bottom: none; }
-    .shift-row .sname { font-weight: bold; min-width: 70px; font-size: 14px; }
-    .shift-row .stime { font-size: 14px; color: #2563eb; font-weight: bold; }
-    .empty-msg { text-align: center; color: #94a3b8; padding: 30px 0; font-size: 14px; }
-    .loading-msg { text-align: center; color: #94a3b8; padding: 20px 0; font-size: 14px; }
-
-    /* 管理者：期限設定 */
-    .deadline-form { display: flex; flex-direction: column; gap: 12px; }
-    .deadline-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .deadline-row label { font-size: 14px; color: #64748b; min-width: 120px; }
-    .deadline-row input[type="date"] { padding: 9px 12px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 14px; outline: none; flex: 1; }
-    .deadline-row input[type="date"]:focus { border-color: #1d4ed8; }
-
-    /* 管理者サブタブ */
+    /* 管理者 */
     .admin-tabs { display: flex; overflow-x: auto; gap: 6px; margin-bottom: 14px; }
     .admin-tab { flex-shrink: 0; padding: 8px 16px; background: #f1f5f9; border: none; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; color: #64748b; }
     .admin-tab.active { background: #1d4ed8; color: white; }
 
-    input[type="text"], input[type="number"] { padding: 10px 12px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 15px; outline: none; }
-    input[type="text"]:focus, input[type="number"]:focus { border-color: #1d4ed8; }
+    .form-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .form-row input { flex: 1; min-width: 80px; padding: 10px 12px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 14px; outline: none; }
+    .form-row input:focus { border-color: #1d4ed8; }
+    .form-row button { padding: 10px 16px; background: #1d4ed8; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; white-space: nowrap; }
 
-    .section-title { font-size: 15px; font-weight: bold; color: #1e3a8a; margin-bottom: 12px; }
+    .staff-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; margin-bottom: 8px; gap: 8px; }
+    .staff-list-item .info { font-size: 14px; flex: 1; }
+    .code-badge { font-size: 12px; color: #64748b; background: #f1f5f9; padding: 2px 8px; border-radius: 6px; font-weight: bold; margin-left: 6px; }
+    .pin-badge { font-size: 11px; color: #10b981; margin-left: 4px; }
+
+    .date-group { margin-bottom: 14px; }
+    .date-group-header { background: #1d4ed8; color: white; padding: 8px 14px; border-radius: 10px 10px 0 0; font-size: 14px; font-weight: bold; }
+    .date-group-body { border: 1.5px solid #e2e8f0; border-top: none; border-radius: 0 0 10px 10px; }
+    .shift-row { display: flex; align-items: center; padding: 10px 14px; border-bottom: 1px solid #f1f5f9; gap: 10px; }
+    .shift-row:last-child { border-bottom: none; }
+    .shift-row .sname { font-weight: bold; min-width: 70px; font-size: 14px; }
+    .shift-row .stime { font-size: 13px; color: #2563eb; font-weight: bold; }
+
     .filter-row { display: flex; gap: 8px; margin-bottom: 12px; }
-    .filter-row input { flex: 1; }
+    .filter-row input { flex: 1; padding: 10px 12px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 14px; outline: none; }
     .filter-row button { background: #f1f5f9; border: none; border-radius: 10px; padding: 10px 14px; font-size: 13px; cursor: pointer; }
+
+    .deadline-form { display: flex; flex-direction: column; gap: 12px; }
+    .deadline-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .deadline-row label { font-size: 14px; color: #64748b; min-width: 130px; }
+    .deadline-row input[type="date"] { padding: 9px 12px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 14px; outline: none; flex: 1; }
+
+    .empty-msg { text-align: center; color: #94a3b8; padding: 30px 0; font-size: 14px; }
+    .loading-msg { text-align: center; color: #94a3b8; padding: 20px 0; font-size: 14px; }
+    .section-title { font-size: 15px; font-weight: bold; color: #1e3a8a; margin-bottom: 12px; }
+    hr { border: none; border-top: 1px solid #e2e8f0; margin: 16px 0; }
   </style>
 </head>
 <body>
@@ -157,31 +149,54 @@
 <div id="page-staff" class="page active">
   <div class="container">
 
-    <!-- コード入力 -->
-    <div class="card" id="code-card">
-      <div class="code-box">
+    <!-- ステップ1: コード入力 -->
+    <div class="card" id="card-code">
+      <div class="auth-box">
         <p>スタッフコードを入力してください</p>
-        <input type="number" class="code-input" id="staff-code-input" placeholder="000" maxlength="6" />
-        <br/>
-        <button class="code-btn" onclick="loginWithCode()">ログイン</button>
-        <div id="login-msg"></div>
+        <input type="text" inputmode="numeric" class="auth-input" id="input-code" placeholder="例: 001" maxlength="10" />
+        <button class="auth-btn" onclick="stepCode()">次へ</button>
+        <div id="msg-code"></div>
       </div>
     </div>
 
-    <!-- シフト入力（ログイン後） -->
+    <!-- ステップ2a: PIN設定（初回） -->
+    <div class="card" id="card-set-pin" style="display:none">
+      <div class="auth-box">
+        <p style="color:#1d4ed8;font-weight:bold;margin-bottom:8px">初回ログイン</p>
+        <p>ご自身のPIN（4桁の数字）を設定してください</p>
+        <input type="text" inputmode="numeric" class="auth-input" id="input-pin-set" placeholder="0000" maxlength="4" />
+        <input type="text" inputmode="numeric" class="auth-input" id="input-pin-confirm" placeholder="もう一度入力" maxlength="4" style="margin-top:8px" />
+        <button class="auth-btn" onclick="stepSetPin()">PINを設定する</button>
+        <div id="msg-set-pin"></div>
+      </div>
+    </div>
+
+    <!-- ステップ2b: PIN入力（2回目以降） -->
+    <div class="card" id="card-pin" style="display:none">
+      <div class="auth-box">
+        <p id="pin-staff-name-label" style="font-weight:bold;margin-bottom:8px"></p>
+        <p>PINを入力してください</p>
+        <input type="text" inputmode="numeric" class="auth-input" id="input-pin" placeholder="0000" maxlength="4" />
+        <button class="auth-btn" onclick="stepPin()">ログイン</button>
+        <button style="background:none;border:none;color:#94a3b8;margin-top:12px;cursor:pointer;font-size:13px" onclick="resetToCode()">← コードを入力し直す</button>
+        <div id="msg-pin"></div>
+      </div>
+    </div>
+
+    <!-- ログイン後メイン -->
     <div id="staff-main" style="display:none">
       <div class="staff-greeting" id="staff-greeting"></div>
+      <button class="logout-btn" onclick="logout()">ログアウト</button>
 
-      <!-- サブタブ -->
       <div class="sub-tabs" style="margin-top:12px">
         <button class="sub-tab active" onclick="showStaffTab('input')">📝 シフト入力</button>
         <button class="sub-tab" onclick="showStaffTab('submitted')">✅ 提出済み</button>
+        <button class="sub-tab" onclick="showStaffTab('settings')">⚙️ 設定</button>
       </div>
 
-      <!-- シフト入力タブ -->
+      <!-- シフト入力 -->
       <div id="staff-tab-input">
         <div id="deadline-banner" class="deadline-banner normal">📅 読み込み中...</div>
-
         <div class="card">
           <div class="half-nav">
             <button onclick="changeHalf(-1)">◀</button>
@@ -190,25 +205,38 @@
           </div>
           <div class="cal-grid" id="cal-grid"></div>
         </div>
-
-        <div class="card" id="time-card">
+        <div class="card">
           <div class="section-title">⏰ 出勤可能時間を塗りつぶしてください</div>
           <div class="legend">
             <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>選択中</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>提出済み</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#bbf7d0;border:1px solid #6ee7b7"></div>提出済み</div>
           </div>
           <div id="time-slots-container"><div class="no-sel-msg">上のカレンダーで日付を選んでください</div></div>
         </div>
-
         <button class="primary-btn" id="submit-btn" onclick="submitShifts()">シフトを提出する</button>
         <div id="submit-msg"></div>
       </div>
 
-      <!-- 提出済みタブ -->
+      <!-- 提出済み -->
       <div id="staff-tab-submitted" style="display:none">
         <div class="card">
           <div class="section-title">📋 提出済みシフト一覧</div>
           <div id="submitted-list"><div class="loading-msg">読み込み中...</div></div>
+        </div>
+      </div>
+
+      <!-- 設定 -->
+      <div id="staff-tab-settings" style="display:none">
+        <div class="card">
+          <div class="section-title">🔐 PINの変更</div>
+          <p style="font-size:13px;color:#64748b;margin-bottom:14px">現在のPINと新しいPINを入力してください</p>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <input type="text" inputmode="numeric" id="pin-current" placeholder="現在のPIN（4桁）" maxlength="4" style="padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:15px;outline:none" />
+            <input type="text" inputmode="numeric" id="pin-new" placeholder="新しいPIN（4桁）" maxlength="4" style="padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:15px;outline:none" />
+            <input type="text" inputmode="numeric" id="pin-new-confirm" placeholder="新しいPIN（確認）" maxlength="4" style="padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:15px;outline:none" />
+            <button class="primary-btn" onclick="changePin()">PINを変更する</button>
+            <div id="pin-change-msg"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -241,11 +269,12 @@
       <div class="card">
         <div class="section-title">👥 スタッフ登録</div>
         <div class="form-row" style="margin-bottom:12px">
-          <input type="text" id="new-staff-name" placeholder="名前（例：山田 太郎）" />
-          <input type="text" id="new-staff-code" placeholder="コード（例：001）" style="max-width:110px" />
+          <input type="text" id="new-staff-name" placeholder="名前" />
+          <input type="text" id="new-staff-code" placeholder="コード（例:001）" style="max-width:120px" />
           <button onclick="registerStaff()">追加</button>
         </div>
         <div id="staff-register-msg"></div>
+        <hr>
         <div id="staff-list-admin"><div class="loading-msg">読み込み中...</div></div>
       </div>
     </div>
@@ -254,7 +283,7 @@
     <div id="admin-tab-deadline" style="display:none">
       <div class="card">
         <div class="section-title">📅 シフト提出期限の設定</div>
-        <p style="font-size:13px;color:#64748b;margin-bottom:16px">シフト対象期間の開始日と締切日を設定してください。設定がない場合は「開始日の10日前」が自動で使われます。</p>
+        <p style="font-size:13px;color:#64748b;margin-bottom:16px">設定がない場合は「開始日の10日前」が自動適用されます。</p>
         <div class="deadline-form">
           <div class="deadline-row">
             <label>対象期間の開始日</label>
@@ -267,7 +296,7 @@
           <button class="primary-btn" onclick="saveDeadline()" style="margin-top:4px">保存する</button>
           <div id="deadline-save-msg"></div>
         </div>
-        <hr style="margin:20px 0;border:none;border-top:1px solid #e2e8f0">
+        <hr>
         <div class="section-title" style="margin-bottom:8px">設定済み期限一覧</div>
         <div id="deadline-list"><div class="loading-msg">読み込み中...</div></div>
       </div>
@@ -285,14 +314,13 @@ const HOUR_START = 9, HOUR_END = 23, MINS_PER_SLOT = 30;
 const TOTAL_SLOTS = (HOUR_END - HOUR_START) * (60 / MINS_PER_SLOT); // 28
 
 let currentStaff = null;
-let selectedDates = {}; // { 'YYYY-MM-DD': [bool x TOTAL_SLOTS] }
-let submittedDates = {}; // { 'YYYY-MM-DD': {start_time, end_time, id} }
+let tempStaff = null; // コード入力後、PIN前の一時保存
+let selectedDates = {};
+let submittedDates = {};
 let currentDeadline = null;
 
 const today = new Date(); today.setHours(0,0,0,0);
-let calYear = today.getFullYear();
-let calMonth = today.getMonth();
-let calHalf = today.getDate() <= 15 ? 0 : 1;
+let calYear, calMonth, calHalf;
 
 // ====== ページ切替 ======
 function showPage(p) {
@@ -303,81 +331,172 @@ function showPage(p) {
   if (p === 'admin') { loadAdminShifts(); loadStaffList(); loadDeadlineList(); }
 }
 
-// ====== スタッフタブ切替 ======
 function showStaffTab(tab) {
-  document.getElementById('staff-tab-input').style.display = tab === 'input' ? 'block' : 'none';
-  document.getElementById('staff-tab-submitted').style.display = tab === 'submitted' ? 'block' : 'none';
-  document.querySelectorAll('.sub-tab').forEach((e,i) => e.classList.toggle('active', (tab==='input'&&i===0)||(tab==='submitted'&&i===1)));
+  ['input','submitted','settings'].forEach(t => {
+    document.getElementById('staff-tab-' + t).style.display = t === tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.sub-tab').forEach((e,i) => {
+    e.classList.toggle('active', ['input','submitted','settings'][i] === tab);
+  });
   if (tab === 'submitted') loadSubmittedShifts();
 }
 
-// ====== 管理者タブ切替 ======
 function showAdminTab(tab) {
   ['shifts','staff','deadline'].forEach(t => {
     document.getElementById('admin-tab-' + t).style.display = t === tab ? 'block' : 'none';
   });
-  document.querySelectorAll('.admin-tab').forEach((e, i) => {
+  document.querySelectorAll('.admin-tab').forEach((e,i) => {
     e.classList.toggle('active', ['shifts','staff','deadline'][i] === tab);
   });
   if (tab === 'staff') loadStaffList();
   if (tab === 'deadline') loadDeadlineList();
 }
 
-// ====== コードログイン ======
-async function loginWithCode() {
-  const code = document.getElementById('staff-code-input').value.trim();
-  const msgEl = document.getElementById('login-msg');
+// ====== 認証フロー ======
+async function stepCode() {
+  const code = document.getElementById('input-code').value.trim();
+  const msgEl = document.getElementById('msg-code');
   if (!code) { msgEl.innerHTML = '<div class="msg-error">コードを入力してください</div>'; return; }
 
   const { data, error } = await sb.from('staff').select('*').eq('code', code).maybeSingle();
-  if (error || !data) {
-    msgEl.innerHTML = '<div class="msg-error">コードが見つかりません。管理者に確認してください。</div>';
-    return;
+  if (error || !data) { msgEl.innerHTML = '<div class="msg-error">コードが見つかりません。管理者に確認してください。</div>'; return; }
+
+  tempStaff = data;
+  document.getElementById('card-code').style.display = 'none';
+
+  if (!data.pin) {
+    // 初回：PIN設定へ
+    document.getElementById('card-set-pin').style.display = 'block';
+  } else {
+    // 2回目以降：PIN入力へ
+    document.getElementById('pin-staff-name-label').textContent = `${data.name} さん`;
+    document.getElementById('card-pin').style.display = 'block';
   }
-  currentStaff = data;
-  document.getElementById('code-card').style.display = 'none';
+}
+
+async function stepSetPin() {
+  const pin1 = document.getElementById('input-pin-set').value.trim();
+  const pin2 = document.getElementById('input-pin-confirm').value.trim();
+  const msgEl = document.getElementById('msg-set-pin');
+
+  if (pin1.length !== 4 || !/^\d+$/.test(pin1)) { msgEl.innerHTML = '<div class="msg-error">PINは4桁の数字で入力してください</div>'; return; }
+  if (pin1 !== pin2) { msgEl.innerHTML = '<div class="msg-error">PINが一致しません</div>'; return; }
+
+  const { error } = await sb.from('staff').update({ pin: pin1 }).eq('id', tempStaff.id);
+  if (error) { msgEl.innerHTML = '<div class="msg-error">設定に失敗しました</div>'; return; }
+
+  tempStaff.pin = pin1;
+  completeLogin(tempStaff);
+}
+
+async function stepPin() {
+  const pin = document.getElementById('input-pin').value.trim();
+  const msgEl = document.getElementById('msg-pin');
+
+  if (!pin) { msgEl.innerHTML = '<div class="msg-error">PINを入力してください</div>'; return; }
+  if (pin !== tempStaff.pin) { msgEl.innerHTML = '<div class="msg-error">PINが違います</div>'; return; }
+
+  completeLogin(tempStaff);
+}
+
+async function completeLogin(staff) {
+  currentStaff = staff;
+  document.getElementById('card-set-pin').style.display = 'none';
+  document.getElementById('card-pin').style.display = 'none';
   document.getElementById('staff-main').style.display = 'block';
-  document.getElementById('staff-greeting').textContent = `👋 こんにちは、${data.name} さん`;
-  await loadCurrentDeadline();
+  document.getElementById('staff-greeting').textContent = `👋 こんにちは、${staff.name} さん`;
+
+  // 提出期限が来ていない最新の期間を自動選択
+  await initCalendarPeriod();
   await loadSubmittedDates();
   renderCalendar();
   renderTimeSlots();
 }
 
-// コードログインのEnterキー対応
-document.getElementById('staff-code-input').addEventListener('keydown', e => { if (e.key === 'Enter') loginWithCode(); });
-
-// ====== 期限の取得 ======
-async function loadCurrentDeadline() {
-  const periodStart = getPeriodStart(calYear, calMonth, calHalf);
-  const periodStartStr = toDateStr(periodStart);
-
-  // DBから取得
-  const { data } = await sb.from('deadlines').select('*').eq('period_start', periodStartStr).maybeSingle();
-  if (data) {
-    currentDeadline = new Date(data.deadline + 'T23:59:59');
-  } else {
-    // デフォルト：開始日の10日前
-    const d = new Date(periodStart);
-    d.setDate(d.getDate() - 10);
-    d.setHours(23,59,59,0);
-    currentDeadline = d;
-  }
-  renderDeadlineBanner();
+function resetToCode() {
+  tempStaff = null;
+  document.getElementById('card-pin').style.display = 'none';
+  document.getElementById('card-set-pin').style.display = 'none';
+  document.getElementById('card-code').style.display = 'block';
+  document.getElementById('input-code').value = '';
+  document.getElementById('msg-code').innerHTML = '';
 }
 
-function getPeriodStart(y, m, half) {
-  return new Date(y, m, half === 0 ? 1 : 16);
+function logout() {
+  currentStaff = null; tempStaff = null;
+  selectedDates = {}; submittedDates = {};
+  document.getElementById('staff-main').style.display = 'none';
+  document.getElementById('card-code').style.display = 'block';
+  document.getElementById('input-code').value = '';
+  document.getElementById('msg-code').innerHTML = '';
+}
+
+// ====== PIN変更 ======
+async function changePin() {
+  const cur = document.getElementById('pin-current').value.trim();
+  const n1 = document.getElementById('pin-new').value.trim();
+  const n2 = document.getElementById('pin-new-confirm').value.trim();
+  const msgEl = document.getElementById('pin-change-msg');
+
+  if (cur !== currentStaff.pin) { msgEl.innerHTML = '<div class="msg-error">現在のPINが違います</div>'; return; }
+  if (n1.length !== 4 || !/^\d+$/.test(n1)) { msgEl.innerHTML = '<div class="msg-error">新しいPINは4桁の数字で入力してください</div>'; return; }
+  if (n1 !== n2) { msgEl.innerHTML = '<div class="msg-error">新しいPINが一致しません</div>'; return; }
+
+  const { error } = await sb.from('staff').update({ pin: n1 }).eq('id', currentStaff.id);
+  if (error) { msgEl.innerHTML = '<div class="msg-error">変更に失敗しました</div>'; return; }
+
+  currentStaff.pin = n1;
+  msgEl.innerHTML = '<div class="msg-success">✅ PINを変更しました</div>';
+  document.getElementById('pin-current').value = '';
+  document.getElementById('pin-new').value = '';
+  document.getElementById('pin-new-confirm').value = '';
+}
+
+// ====== カレンダー期間の自動選択 ======
+async function initCalendarPeriod() {
+  // 今日がどの半月期間か
+  const y = today.getFullYear(), m = today.getMonth(), d = today.getDate();
+  let half = d <= 15 ? 0 : 1;
+  let year = y, month = m;
+
+  // 現在期間の締切を確認
+  const dl = await getDeadlineForPeriod(year, month, half);
+  if (dl && today > dl) {
+    // 締切が過ぎていれば次の半月へ
+    half++;
+    if (half > 1) { half = 0; month++; }
+    if (month > 11) { month = 0; year++; }
+  }
+
+  calYear = year; calMonth = month; calHalf = half;
+  await loadCurrentDeadline();
+}
+
+async function getDeadlineForPeriod(y, m, half) {
+  const periodStart = new Date(y, m, half === 0 ? 1 : 16);
+  const { data } = await sb.from('deadlines').select('deadline').eq('period_start', toDateStr(periodStart)).maybeSingle();
+  if (data) {
+    const dl = new Date(data.deadline + 'T23:59:59');
+    return dl;
+  }
+  // デフォルト：開始日-10日
+  const dl = new Date(periodStart);
+  dl.setDate(dl.getDate() - 10);
+  dl.setHours(23,59,59,0);
+  return dl;
+}
+
+async function loadCurrentDeadline() {
+  currentDeadline = await getDeadlineForPeriod(calYear, calMonth, calHalf);
+  renderDeadlineBanner();
 }
 
 function renderDeadlineBanner() {
   const banner = document.getElementById('deadline-banner');
   if (!currentDeadline) { banner.style.display = 'none'; return; }
-
   const now = new Date();
   const diffDays = Math.ceil((currentDeadline - now) / (1000*60*60*24));
-  const dlStr = `${currentDeadline.getMonth()+1}/${currentDeadline.getDate()}`;
-
+  const dlStr = `${currentDeadline.getMonth()+1}月${currentDeadline.getDate()}日`;
   if (diffDays < 0) {
     banner.className = 'deadline-banner over';
     banner.textContent = `⚠️ 提出期限（${dlStr}）は終了しました`;
@@ -394,18 +513,15 @@ function renderDeadlineBanner() {
 }
 
 function isDeadlineOver() {
-  if (!currentDeadline) return false;
-  return new Date() > currentDeadline;
+  return currentDeadline ? new Date() > currentDeadline : false;
 }
 
-// ====== 提出済み日付を取得 ======
+// ====== 提出済み取得 ======
 async function loadSubmittedDates() {
   if (!currentStaff) return;
   const { data } = await sb.from('shift_requests').select('*').eq('staff_id', currentStaff.id);
   submittedDates = {};
-  if (data) {
-    data.forEach(r => { submittedDates[r.date] = { start_time: r.start_time, end_time: r.end_time, id: r.id }; });
-  }
+  if (data) data.forEach(r => { submittedDates[r.date] = r; });
 }
 
 // ====== カレンダー ======
@@ -427,11 +543,10 @@ function renderCalendar() {
 
   const grid = document.getElementById('cal-grid');
   grid.innerHTML = '';
-  DOW.forEach((d, i) => {
+  DOW.forEach((d,i) => {
     const h = document.createElement('div');
     h.className = 'cal-header' + (i===0?' sun':i===6?' sat':'');
-    h.textContent = d;
-    grid.appendChild(h);
+    h.textContent = d; grid.appendChild(h);
   });
 
   const firstDow = new Date(calYear, calMonth, startDay).getDay();
@@ -452,7 +567,7 @@ function renderCalendar() {
     const cell = document.createElement('div');
     let cls = 'cal-day';
     if (isPast) cls += ' past';
-    else if (over) cls += ' over-deadline';
+    else if (over && !isSubmitted) cls += ' over-deadline';
     else if (isSelected) cls += ' selected';
     if (isToday) cls += ' today';
     if (dow===0) cls += ' sun';
@@ -462,13 +577,11 @@ function renderCalendar() {
 
     if (isSubmitted || isSelected) {
       const dot = document.createElement('div');
-      dot.className = 'dot' + (isSubmitted ? ' submitted' : '');
+      dot.className = 'dot ' + (isSelected ? 'new' : 'submitted');
       cell.appendChild(dot);
     }
 
-    if (!isPast && !over) {
-      cell.addEventListener('click', () => toggleDate(dateStr));
-    } else if (isSubmitted && !isPast) {
+    if (!isPast && (!over || isSubmitted)) {
       cell.addEventListener('click', () => toggleDate(dateStr));
     }
     grid.appendChild(cell);
@@ -476,17 +589,13 @@ function renderCalendar() {
 }
 
 function toggleDate(dateStr) {
-  if (isDeadlineOver()) return;
+  if (isDeadlineOver() && !(dateStr in submittedDates)) return;
   if (dateStr in selectedDates) {
     delete selectedDates[dateStr];
   } else {
-    // 提出済みのスロットがあれば初期値として読み込む
     const slots = new Array(TOTAL_SLOTS).fill(false);
-    if (dateStr in submittedDates) {
-      const s = submittedDates[dateStr];
-      const startIdx = timeToSlot(s.start_time);
-      const endIdx = timeToSlot(s.end_time);
-      for (let i = startIdx; i < endIdx; i++) slots[i] = true;
+    if (dateStr in submittedDates && submittedDates[dateStr].slots_data) {
+      submittedDates[dateStr].slots_data.split(',').forEach(i => { if (i !== '') slots[parseInt(i)] = true; });
     }
     selectedDates[dateStr] = slots;
   }
@@ -494,7 +603,7 @@ function toggleDate(dateStr) {
   renderTimeSlots();
 }
 
-// ====== 時間バー ======
+// ====== 時間バー（分割シフト対応）======
 function renderTimeSlots() {
   const container = document.getElementById('time-slots-container');
   const dates = Object.keys(selectedDates).sort();
@@ -502,7 +611,6 @@ function renderTimeSlots() {
     container.innerHTML = '<div class="no-sel-msg">上のカレンダーで日付を選んでください</div>';
     return;
   }
-
   container.innerHTML = '';
   dates.forEach(dateStr => {
     const d = new Date(dateStr + 'T00:00:00');
@@ -514,30 +622,35 @@ function renderTimeSlots() {
 
     const header = document.createElement('div');
     header.className = 'day-block-header';
-    header.innerHTML = `<span>${label}${isAlreadySubmitted ? ' <span style="font-size:11px;color:#10b981;font-weight:normal">（提出済み・修正中）</span>' : ''}</span>
+    header.innerHTML = `<span>${label}${isAlreadySubmitted ? ' <span style="font-size:11px;color:#10b981;font-weight:normal">（修正中）</span>' : ''}</span>
       <button class="remove-btn" onclick="removeDate('${dateStr}')">×</button>`;
     block.appendChild(header);
 
     const wrap = document.createElement('div');
     wrap.className = 'time-bar-wrap';
 
-    // ラベル
     const labels = document.createElement('div');
     labels.className = 'time-labels';
     for (let h = HOUR_START; h <= HOUR_END; h += 2) {
-      const s = document.createElement('span');
-      s.textContent = `${h}時`;
-      labels.appendChild(s);
+      const s = document.createElement('span'); s.textContent = `${h}時`; labels.appendChild(s);
     }
     wrap.appendChild(labels);
 
-    // バー
     const bar = document.createElement('div');
     bar.className = 'time-bar';
     bar.dataset.date = dateStr;
+
+    // 提出済みスロットの背景色表示
+    const submittedSlots = new Array(TOTAL_SLOTS).fill(false);
+    if (isAlreadySubmitted && submittedDates[dateStr].slots_data) {
+      submittedDates[dateStr].slots_data.split(',').forEach(i => { if (i !== '') submittedSlots[parseInt(i)] = true; });
+    }
+
     for (let i = 0; i < TOTAL_SLOTS; i++) {
       const slot = document.createElement('div');
-      slot.className = 'time-slot' + (selectedDates[dateStr][i] ? ' filled' : '');
+      const isFilled = selectedDates[dateStr][i];
+      const isSubBg = submittedSlots[i] && !isFilled;
+      slot.className = 'time-slot' + (isFilled ? ' filled' : '') + (isSubBg ? ' submitted-bg' : '');
       slot.dataset.index = i;
       bar.appendChild(slot);
     }
@@ -550,11 +663,7 @@ function renderTimeSlots() {
     updateRangeText(dateStr, rangeEl);
     wrap.appendChild(rangeEl);
 
-    const hint = document.createElement('div');
-    hint.className = 'time-hint';
-    hint.textContent = 'タップ・ドラッグで出勤可能時間を塗りつぶしてください';
-    wrap.appendChild(hint);
-
+    wrap.appendChild(Object.assign(document.createElement('div'), { className: 'time-hint', textContent: 'タップ・ドラッグで塗りつぶし／もう一度タップで解除' }));
     block.appendChild(wrap);
     container.appendChild(block);
   });
@@ -562,27 +671,23 @@ function renderTimeSlots() {
 
 function removeDate(dateStr) {
   delete selectedDates[dateStr];
-  renderCalendar();
-  renderTimeSlots();
+  renderCalendar(); renderTimeSlots();
 }
 
 function setupBarEvents(bar, dateStr) {
   let dragging = false, fillMode = true, lastIdx = -1;
-
   function getIdx(e) {
     const rect = bar.getBoundingClientRect();
     const x = e.touches ? e.touches[0].clientX : e.clientX;
     return Math.max(0, Math.min(TOTAL_SLOTS-1, Math.floor((x - rect.left) / rect.width * TOTAL_SLOTS)));
   }
-
   function apply(idx) {
-    if (idx === lastIdx) return;
-    lastIdx = idx;
+    if (idx === lastIdx) return; lastIdx = idx;
     selectedDates[dateStr][idx] = fillMode;
-    bar.querySelectorAll('.time-slot')[idx].className = 'time-slot' + (fillMode ? ' filled' : '');
+    const slots = bar.querySelectorAll('.time-slot');
+    slots[idx].className = 'time-slot' + (fillMode ? ' filled' : '');
     updateRangeText(dateStr);
   }
-
   bar.addEventListener('mousedown', e => { e.preventDefault(); dragging = true; lastIdx = -1; const i = getIdx(e); fillMode = !selectedDates[dateStr][i]; apply(i); });
   window.addEventListener('mousemove', e => { if (dragging) apply(getIdx(e)); });
   window.addEventListener('mouseup', () => { dragging = false; });
@@ -601,12 +706,37 @@ function timeToSlot(timeStr) {
   return Math.round((h * 60 + m - HOUR_START * 60) / MINS_PER_SLOT);
 }
 
+// 不連続な範囲を複数表示
+function getRangesFromSlots(slots) {
+  const ranges = [];
+  let start = null;
+  for (let i = 0; i <= slots.length; i++) {
+    if (i < slots.length && slots[i]) {
+      if (start === null) start = i;
+    } else {
+      if (start !== null) { ranges.push({ start, end: i }); start = null; }
+    }
+  }
+  return ranges;
+}
+
 function updateRangeText(dateStr, el) {
   const rangeEl = el || document.getElementById(`range-${dateStr}`);
   if (!rangeEl) return;
-  const filled = selectedDates[dateStr]?.map((v,i)=>v?i:-1).filter(i=>i>=0) || [];
-  if (filled.length === 0) { rangeEl.textContent = ''; return; }
-  rangeEl.textContent = `✅ ${slotToTime(filled[0])} 〜 ${slotToTime(filled[filled.length-1]+1)}`;
+  const slots = selectedDates[dateStr];
+  if (!slots) return;
+  const ranges = getRangesFromSlots(slots);
+  if (ranges.length === 0) { rangeEl.textContent = ''; return; }
+  rangeEl.textContent = '✅ ' + ranges.map(r => `${slotToTime(r.start)} 〜 ${slotToTime(r.end)}`).join('　');
+}
+
+function rangesToDisplayText(slotsData) {
+  if (!slotsData) return '—';
+  const slots = new Array(TOTAL_SLOTS).fill(false);
+  slotsData.split(',').forEach(i => { if (i !== '') slots[parseInt(i)] = true; });
+  const ranges = getRangesFromSlots(slots);
+  if (ranges.length === 0) return '—';
+  return ranges.map(r => `${slotToTime(r.start)}〜${slotToTime(r.end)}`).join(' / ');
 }
 
 // ====== シフト提出 ======
@@ -621,30 +751,26 @@ async function submitShifts() {
   try {
     for (const dateStr of dates) {
       const slots = selectedDates[dateStr];
-      const filled = slots.map((v,i)=>v?i:-1).filter(i=>i>=0);
-      if (filled.length === 0) continue;
-      const startTime = slotToTime(filled[0]);
-      const endTime = slotToTime(filled[filled.length-1]+1);
+      const ranges = getRangesFromSlots(slots);
+      if (ranges.length === 0) continue;
+      const slotsData = slots.map((v,i) => v ? i : null).filter(i => i !== null).join(',');
+      const startTime = slotToTime(ranges[0].start);
+      const endTime = slotToTime(ranges[ranges.length-1].end);
 
       if (submittedDates[dateStr]) {
-        // 既存の更新
-        await sb.from('shift_requests').update({ start_time: startTime, end_time: endTime }).eq('id', submittedDates[dateStr].id);
+        await sb.from('shift_requests').update({ start_time: startTime, end_time: endTime, slots_data: slotsData }).eq('id', submittedDates[dateStr].id);
       } else {
-        // 新規登録
-        await sb.from('shift_requests').insert({ staff_id: currentStaff.id, date: dateStr, start_time: startTime, end_time: endTime });
+        await sb.from('shift_requests').insert({ staff_id: currentStaff.id, date: dateStr, start_time: startTime, end_time: endTime, slots_data: slotsData });
       }
     }
-
     document.getElementById('submit-msg').innerHTML = `<div class="msg-success">✅ ${dates.length}日分のシフトを提出しました！</div>`;
     selectedDates = {};
     await loadSubmittedDates();
-    renderCalendar();
-    renderTimeSlots();
+    renderCalendar(); renderTimeSlots();
   } catch(e) {
     console.error(e);
     document.getElementById('submit-msg').innerHTML = '<div class="msg-error">送信に失敗しました。</div>';
   }
-
   btn.disabled = false; btn.textContent = 'シフトを提出する';
 }
 
@@ -658,9 +784,9 @@ async function loadSubmittedShifts() {
   listEl.innerHTML = entries.map(([dateStr, s]) => {
     const d = new Date(dateStr + 'T00:00:00');
     const label = `${d.getMonth()+1}/${d.getDate()}（${DOW[d.getDay()]}）`;
-    const time = `${s.start_time.slice(0,5)} 〜 ${s.end_time.slice(0,5)}`;
+    const timeText = rangesToDisplayText(s.slots_data);
     return `<div class="submitted-item">
-      <div><div class="date-label">${label}</div><div class="time-label">${time}</div></div>
+      <div><div class="date-label">${label}</div><div class="time-label">${timeText}</div></div>
       ${!over ? `<button class="del-btn" onclick="deleteShift('${s.id}','${dateStr}')">削除</button>` : ''}
     </div>`;
   }).join('');
@@ -670,8 +796,7 @@ async function deleteShift(id, dateStr) {
   if (!confirm('このシフトを削除しますか？')) return;
   await sb.from('shift_requests').delete().eq('id', id);
   delete submittedDates[dateStr];
-  renderCalendar();
-  loadSubmittedShifts();
+  renderCalendar(); loadSubmittedShifts();
 }
 
 // ====== 管理者：シフト一覧 ======
@@ -679,16 +804,11 @@ async function loadAdminShifts() {
   const listEl = document.getElementById('admin-shift-list');
   const filterDate = document.getElementById('admin-filter-date').value;
   listEl.innerHTML = '<div class="loading-msg">読み込み中...</div>';
-
   let q = sb.from('shift_requests').select('*, staff(name)').order('date').order('start_time');
   if (filterDate) q = q.eq('date', filterDate);
   const { data, error } = await q;
+  if (error || !data || data.length === 0) { listEl.innerHTML = '<div class="empty-msg">提出されたシフトはありません。</div>'; return; }
 
-  if (error || !data || data.length === 0) {
-    listEl.innerHTML = '<div class="empty-msg">提出されたシフトはありません。</div>'; return;
-  }
-
-  // 日付でグループ化
   const groups = {};
   data.forEach(r => { if (!groups[r.date]) groups[r.date] = []; groups[r.date].push(r); });
 
@@ -698,7 +818,7 @@ async function loadAdminShifts() {
     const rowsHtml = rows.map(r => `
       <div class="shift-row">
         <span class="sname">${r.staff?.name || '不明'}</span>
-        <span class="stime">${r.start_time.slice(0,5)} 〜 ${r.end_time.slice(0,5)}</span>
+        <span class="stime">${rangesToDisplayText(r.slots_data)}</span>
       </div>`).join('');
     return `<div class="date-group"><div class="date-group-header">${label}</div><div class="date-group-body">${rowsHtml}</div></div>`;
   }).join('');
@@ -706,22 +826,15 @@ async function loadAdminShifts() {
 
 function clearAdminFilter() { document.getElementById('admin-filter-date').value = ''; loadAdminShifts(); }
 
-// ====== 管理者：スタッフ登録 ======
+// ====== 管理者：スタッフ管理 ======
 async function registerStaff() {
   const name = document.getElementById('new-staff-name').value.trim();
   const code = document.getElementById('new-staff-code').value.trim();
   const msgEl = document.getElementById('staff-register-msg');
   if (!name || !code) { msgEl.innerHTML = '<div class="msg-error">名前とコードを入力してください。</div>'; return; }
-
   const { error } = await sb.from('staff').insert({ name, code });
-  if (error) {
-    msgEl.innerHTML = '<div class="msg-error">登録に失敗しました。コードが重複している可能性があります。</div>';
-  } else {
-    msgEl.innerHTML = '<div class="msg-success">✅ 登録しました。</div>';
-    document.getElementById('new-staff-name').value = '';
-    document.getElementById('new-staff-code').value = '';
-    loadStaffList();
-  }
+  if (error) { msgEl.innerHTML = '<div class="msg-error">登録に失敗しました。コードが重複している可能性があります。</div>'; }
+  else { msgEl.innerHTML = '<div class="msg-success">✅ 登録しました。</div>'; document.getElementById('new-staff-name').value = ''; document.getElementById('new-staff-code').value = ''; loadStaffList(); }
 }
 
 async function loadStaffList() {
@@ -730,13 +843,27 @@ async function loadStaffList() {
   if (!data || data.length === 0) { listEl.innerHTML = '<div class="empty-msg">スタッフが登録されていません。</div>'; return; }
   listEl.innerHTML = data.map(s => `
     <div class="staff-list-item">
-      <div class="info">${s.name}<span class="code-badge">${s.code || '未設定'}</span></div>
-      <button class="del-btn" onclick="deleteStaff('${s.id}')">削除</button>
+      <div class="info">
+        ${s.name}
+        <span class="code-badge">${s.code || '未設定'}</span>
+        ${s.pin ? '<span class="pin-badge">PIN設定済</span>' : '<span style="font-size:11px;color:#f59e0b;margin-left:4px">PIN未設定</span>'}
+      </div>
+      <div style="display:flex;gap:6px">
+        ${s.pin ? `<button class="del-btn" style="border-color:#fde68a;color:#92400e" onclick="resetPin('${s.id}')">PIN削除</button>` : ''}
+        <button class="del-btn" onclick="deleteStaff('${s.id}')">削除</button>
+      </div>
     </div>`).join('');
 }
 
+async function resetPin(id) {
+  if (!confirm('このスタッフのPINをリセットしますか？\n次回ログイン時に新しいPINを設定できるようになります。')) return;
+  await sb.from('staff').update({ pin: null }).eq('id', id);
+  loadStaffList();
+}
+
 async function deleteStaff(id) {
-  if (!confirm('このスタッフを削除しますか？')) return;
+  if (!confirm('このスタッフを削除しますか？\n※提出済みシフトも合わせて削除されます。')) return;
+  await sb.from('shift_requests').delete().eq('staff_id', id);
   await sb.from('staff').delete().eq('id', id);
   loadStaffList();
 }
@@ -747,7 +874,6 @@ async function saveDeadline() {
   const deadline = document.getElementById('dl-deadline').value;
   const msgEl = document.getElementById('deadline-save-msg');
   if (!periodStart || !deadline) { msgEl.innerHTML = '<div class="msg-error">両方の日付を入力してください。</div>'; return; }
-
   const { error } = await sb.from('deadlines').upsert({ period_start: periodStart, deadline }, { onConflict: 'period_start' });
   if (error) { msgEl.innerHTML = '<div class="msg-error">保存に失敗しました。</div>'; }
   else { msgEl.innerHTML = '<div class="msg-success">✅ 保存しました。</div>'; loadDeadlineList(); }
@@ -761,10 +887,7 @@ async function loadDeadlineList() {
     const ps = new Date(d.period_start + 'T00:00:00');
     const dl = new Date(d.deadline + 'T00:00:00');
     return `<div class="submitted-item">
-      <div>
-        <div class="date-label">${ps.getMonth()+1}/${ps.getDate()} 開始分</div>
-        <div class="time-label">締切：${dl.getMonth()+1}/${dl.getDate()}</div>
-      </div>
+      <div><div class="date-label">${ps.getMonth()+1}/${ps.getDate()} 開始分</div><div class="time-label">締切：${dl.getMonth()+1}/${dl.getDate()}</div></div>
       <button class="del-btn" onclick="deleteDeadline('${d.id}')">削除</button>
     </div>`;
   }).join('');
@@ -781,9 +904,14 @@ function toDateStr(date) {
   return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
 }
 
+// Enterキー対応
+document.getElementById('input-code').addEventListener('keydown', e => { if (e.key==='Enter') stepCode(); });
+document.getElementById('input-pin').addEventListener('keydown', e => { if (e.key==='Enter') stepPin(); });
+document.getElementById('input-pin-confirm').addEventListener('keydown', e => { if (e.key==='Enter') stepSetPin(); });
+
 // リアルタイム同期
 try {
-  sb.channel('shifts-realtime').on('postgres_changes', { event: '*', table: 'shift_requests' }, () => {
+  sb.channel('shifts-rt').on('postgres_changes', { event: '*', table: 'shift_requests' }, () => {
     if (document.getElementById('page-admin').classList.contains('active')) loadAdminShifts();
   }).subscribe();
 } catch(e) {}
