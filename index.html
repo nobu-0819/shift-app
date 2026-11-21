@@ -144,33 +144,12 @@
     .admin-toggle-btn.is-admin { border-color: #6ee7b7; color: #059669; }
 
     /* 管理者：シフト一覧 */
-    .date-group { margin-bottom: 14px; }
-    .date-group-header { background: #1d4ed8; color: white; padding: 8px 14px; border-radius: 10px 10px 0 0; font-size: 14px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
-    .date-group-header .gantt-action-btn { opacity: 0.9; }
-    .date-group-body { border: 1.5px solid #e2e8f0; border-top: none; border-radius: 0 0 10px 10px; overflow: hidden; }
     .empty-msg { text-align: center; color: #94a3b8; padding: 30px 0; font-size: 14px; }
     .loading-msg { text-align: center; color: #94a3b8; padding: 20px 0; font-size: 14px; }
 
     /* ガントチャート */
-    .gantt-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .gantt-inner { min-width: 480px; padding: 8px 14px; }
-    .gantt-row { display: flex; align-items: center; border-bottom: 1px solid #f1f5f9; }
-    .gantt-row:last-child { border-bottom: none; }
-    .gantt-name { width: 80px; min-width: 80px; font-size: 13px; font-weight: bold; color: #1e3a8a; padding: 6px 6px 6px 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .gantt-bar-area { flex: 1; height: 34px; position: relative; background: #f8fafc; border-radius: 4px; }
-    .gantt-bar { position: absolute; top: 5px; height: 24px; background: #f97316; border-radius: 4px; opacity: 0.85; }
-    .gantt-grid-line { position: absolute; top: 0; bottom: 0; width: 1px; background: #e2e8f0; }
-    .gantt-paint-track { position: absolute; inset: 0; display: flex; cursor: pointer; touch-action: none; }
-    .gantt-paint-slot { flex: 1; height: 100%; }
-    .gantt-paint-slot.filled { background: #2563eb; opacity: 0.85; }
-    .gantt-name { width: 100px; min-width: 100px; display: flex; flex-direction: column; justify-content: center; padding: 4px 6px 4px 0; overflow: visible; text-overflow: unset; white-space: normal; font-size: unset; font-weight: unset; color: unset; }
-    .gantt-name-text { font-size: 12px; font-weight: bold; color: #1e3a8a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 94px; display: block; }
-    .gantt-actions { display: flex; gap: 2px; margin-top: 2px; }
-    .gantt-action-btn { font-size: 14px; padding: 0 2px; border: none; background: none; cursor: pointer; opacity: 0.5; touch-action: manipulation; line-height: 1; }
-    .gantt-action-btn:active { opacity: 1; }
     .staff-date-actions { display: flex; gap: 4px; margin-left: auto; }
     .outline-btn { background: #f8fafc; border: 1.5px solid #cbd5e1; color: #374151; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: bold; cursor: pointer; touch-action: manipulation; }
-    .schedule-action-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
 
     /* スタッフ別表示 */
     .staff-card { border: 1.5px solid #e2e8f0; border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
@@ -203,9 +182,6 @@
     input[type="text"]:focus, input[type="number"]:focus { border-color: #1d4ed8; }
 
     .section-title { font-size: 15px; font-weight: bold; color: #1e3a8a; margin-bottom: 12px; }
-    .filter-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
-    .filter-row input { flex: 1; }
-    .filter-row button { background: #f1f5f9; border: none; border-radius: 10px; padding: 10px 14px; font-size: 13px; cursor: pointer; touch-action: manipulation; }
 
     /* 確認モーダル（提出） */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.55); z-index: 500; overflow-y: auto; -webkit-overflow-scrolling: touch; }
@@ -268,23 +244,19 @@
     .matrix-row.closed .matrix-date-col { background: #d1d5db; color: #4b5563; }
     .matrix-row.closed .matrix-cell { background: #f3f4f6; }
     .matrix-cell { font-size: 12px; color: #1e293b; min-width: 78px; }
+    .matrix-edit-btn { display:block; width:100%; padding:2px; border:0; background:transparent; color:inherit; font:inherit; cursor:pointer; }
+    .matrix-edit-btn:hover { text-decoration:underline; }
     .matrix-staff-col { min-width: 78px; }
 
     /* 印刷 */
     @media print {
-      header, .admin-tabs, .view-toggle, .filter-row, .gantt-actions, .schedule-action-btns,
+      header, .admin-tabs, .view-toggle,
       #admin-tab-staff, #admin-tab-deadline, #admin-tab-qr, #admin-tab-proxy,
       #matrix-print-btn, .modal-overlay, #admin-dashboard-cards, #admin-tab-shifts .section-title { display: none !important; }
       body:not(.printing-matrix) #admin-tab-shifts { display: none !important; }
       body { background: white; font-size: 11px; }
       .container { max-width: 100%; padding: 4px; }
       .card { box-shadow: none; border: none; padding: 6px; margin-bottom: 0; }
-      .date-group:nth-child(2n) { page-break-after: always; }
-      .date-group { margin-bottom: 10px; break-inside: avoid; }
-      .gantt-bar { opacity: 1; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-      .date-group-header { border-radius: 4px; padding: 4px 10px; font-size: 12px; }
-      .gantt-name-text { color: black; }
-      .gantt-inner { min-width: unset; }
 
       @page { size: A4 landscape; margin: 8mm; }
       /* 一覧表印刷時：印刷領域以外を完全に除去（レイアウト上の残骸が空白ページを作るのを防ぐ） */
@@ -406,6 +378,7 @@
       <button class="modal-back-btn" onclick="closeAdminEditModal()">キャンセル</button>
       <button class="modal-submit-btn" onclick="adminEditSave()">保存する</button>
     </div>
+    <button type="button" class="outline-btn" onclick="deleteAdminEditDay()">この日の希望をすべて削除</button>
     <div id="admin-edit-msg" style="margin-top:8px"></div>
   </div>
 </div>
@@ -568,9 +541,8 @@
 
     <div class="admin-tabs">
       <button class="admin-tab active" onclick="showAdminTab('deadline')">📅 期限設定</button>
-      <button class="admin-tab" onclick="showAdminTab('shifts')">📋 シフト希望</button>
+      <button class="admin-tab" onclick="showAdminTab('shifts')">📋 シフト希望一覧</button>
       <button class="admin-tab" onclick="showAdminTab('proxy')">✏️ 代理入力</button>
-      <button class="admin-tab" onclick="showAdminTab('schedule')">📝 シフト作成</button>
       <button class="admin-tab" onclick="showAdminTab('staff')">👥 スタッフ管理</button>
       <button class="admin-tab" onclick="showAdminTab('holiday')">🎌 特別営業日</button>
       <button class="admin-tab" onclick="showAdminTab('announce')">📢 お知らせ</button>
@@ -579,16 +551,7 @@
     <div id="admin-tab-shifts">
       <div class="card">
         <div class="section-title">📋 シフト希望一覧</div>
-        <div class="view-toggle">
-          <button class="view-toggle-btn active" id="view-btn-date" onclick="setAdminView('date')">📅 日付別</button>
-          <button class="view-toggle-btn" id="view-btn-staff" onclick="setAdminView('staff')">👤 スタッフ別</button>
-          <button class="view-toggle-btn" id="view-btn-matrix" onclick="setAdminView('matrix')">🗒️ 一覧表</button>
-        </div>
-        <div class="filter-row" id="filter-row">
-          <input type="date" id="admin-filter-date" onchange="loadAdminShifts()" />
-          <button onclick="clearAdminFilter()">全表示</button>
-        </div>
-        <div id="matrix-period-btns" class="view-toggle" style="display:none;flex-wrap:wrap"></div>
+        <div id="matrix-period-btns" class="view-toggle" style="flex-wrap:wrap"></div>
         <button id="matrix-print-btn" style="display:none;background:#1d4ed8;color:white;border:none;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:bold;cursor:pointer;margin-bottom:12px" onclick="openMatrixPrintSelectModal()">🖨️ 印刷する</button>
         <div id="admin-shift-list"><div class="loading-msg">読み込み中...</div></div>
       </div>
@@ -613,19 +576,6 @@
           </div>
           <div id="proxy-msg"></div>
         </div>
-      </div>
-    </div>
-
-    <div id="admin-tab-schedule" style="display:none">
-      <div class="card">
-        <div class="section-title">📝 シフト作成</div>
-        <div id="schedule-period-btns" class="view-toggle" style="flex-wrap:wrap"></div>
-        <div class="schedule-action-btns">
-          <button class="primary-btn" onclick="copyFromRequests()">📋 希望からコピーして開始</button>
-          <button class="outline-btn" onclick="resetSchedule()">↩️ リセット（希望に戻す）</button>
-          <button class="outline-btn" onclick="window.print()">🖨️ 印刷</button>
-        </div>
-        <div id="schedule-list"><div class="empty-msg">「希望からコピーして開始」を押してシフトを作成してください。</div></div>
       </div>
     </div>
 
@@ -786,7 +736,6 @@ let selectedDates = {};
 let submittedDates = {};
 let dateAvailabilityType = {}; // { 'YYYY-MM-DD': 'and' | 'or' }
 let currentDeadline = null;
-let adminViewMode = 'date';
 let pendingDangerAction = null;
 
 const today = new Date(); today.setHours(0,0,0,0);
@@ -837,7 +786,6 @@ async function autoCleanupOldData() {
   const cutoffStr = toDateStr(cutoff);
 
   await sb.from('shift_requests').delete().lt('date', cutoffStr);
-  await sb.from('shift_schedule').delete().lt('date', cutoffStr);
 
   localStorage.setItem(CLEANUP_KEY, todayStr);
 }
@@ -873,17 +821,16 @@ function showStaffTab(tab) {
 
 // ====== 管理者タブ切替 ======
 function showAdminTab(tab) {
-  ['shifts','schedule','staff','deadline','proxy','holiday','announce'].forEach(t => {
+  ['shifts','staff','deadline','proxy','holiday','announce'].forEach(t => {
     document.getElementById('admin-tab-' + t).style.display = t === tab ? 'block' : 'none';
   });
   document.querySelectorAll('.admin-tab').forEach((e, i) => {
-    e.classList.toggle('active', ['deadline','shifts','proxy','schedule','staff','holiday','announce'][i] === tab);
+    e.classList.toggle('active', ['deadline','shifts','proxy','staff','holiday','announce'][i] === tab);
   });
   if (tab === 'staff') loadStaffList();
   if (tab === 'shifts') loadAdminShifts();
   if (tab === 'proxy') loadProxyStaffSelect();
   if (tab === 'deadline') loadDeadlineList();
-  if (tab === 'schedule') loadSchedule();
   if (tab === 'holiday') loadSpecialHolidayList();
   if (tab === 'announce') loadAnnouncementAdminList();
   loadAdminDashboard();
@@ -1952,18 +1899,6 @@ document.getElementById('delete-all-btn').addEventListener('click', () => {
   );
 });
 
-// ====== 管理者：表示切替 ======
-function setAdminView(mode) {
-  adminViewMode = mode;
-  document.getElementById('view-btn-date').classList.toggle('active', mode === 'date');
-  document.getElementById('view-btn-staff').classList.toggle('active', mode === 'staff');
-  document.getElementById('view-btn-matrix').classList.toggle('active', mode === 'matrix');
-  document.getElementById('filter-row').style.display = mode === 'date' ? 'flex' : 'none';
-  document.getElementById('matrix-period-btns').style.display = 'flex'; // 日付別／スタッフ別／一覧表すべてで共通の期間ナビゲーションを表示
-  document.getElementById('matrix-print-btn').style.display = mode === 'matrix' ? 'inline-block' : 'none';
-  loadAdminShifts();
-}
-
 // シフト希望タブで遡れる範囲：上限は最新の提出可能期間、下限はその12半月（=6ヶ月）前まで
 function matrixBounds() {
   const upperIdx = halfMonthIndex(activePeriodStart.getFullYear(), activePeriodStart.getMonth(), activePeriodStart.getDate() === 1 ? 0 : 1);
@@ -1971,7 +1906,7 @@ function matrixBounds() {
   return { lowerIdx, upperIdx };
 }
 
-// 日付別／スタッフ別／一覧表の3ビュー共通の期間選択ボタン
+// 一覧表の期間選択ボタン
 function renderMatrixPeriodBtns() {
   const wrap = document.getElementById('matrix-period-btns');
   if (!wrap) return;
@@ -2000,36 +1935,30 @@ function renderMatrixPeriodBtns() {
 // ====== 管理者：シフト一覧 ======
 async function loadAdminShifts() {
   const listEl = document.getElementById('admin-shift-list');
-  const filterDate = document.getElementById('admin-filter-date').value;
-  document.getElementById('matrix-period-btns').style.display = 'flex';
+  const printButton = document.getElementById('matrix-print-btn');
+  const request = ++matrixLoadRequest;
+  printButton.style.display = 'none';
   listEl.innerHTML = '<div class="loading-msg">読み込み中...</div>';
-
-  // 日付別／スタッフ別／一覧表すべてで、選択中の半月期間に絞り込む
   renderMatrixPeriodBtns();
   const periodStart = getPeriodStart(matrixYear, matrixMonth, matrixHalf);
   const periodEndDay = matrixHalf === 0 ? 15 : new Date(matrixYear, matrixMonth + 1, 0).getDate();
   const periodEnd = new Date(matrixYear, matrixMonth, periodEndDay);
   const psStr = toDateStr(periodStart), peStr = toDateStr(periodEnd);
 
-  if (adminViewMode === 'matrix') {
-    const { data } = await sb.from('shift_requests').select('*, staff(name, code)')
-      .gte('date', psStr).lte('date', peStr).order('date').order('start_time');
-    const { data: allStaff } = await sb.from('staff').select('id, name, code').order('code');
-    renderAdminMatrixView(listEl, data || [], allStaff || [], periodStart, periodEnd);
+  const [requests, staff] = await Promise.all([
+    sb.from('shift_requests').select('*').gte('date', psStr).lte('date', peStr).order('date').order('start_time'),
+    sb.from('staff').select('id, name').order('code'),
+  ]);
+  if (request !== matrixLoadRequest) return;
+  if (requests.error || staff.error) {
+    listEl.innerHTML = '<div class="empty-msg">シフト希望を読み込めませんでした。</div>';
     return;
   }
-
-  let q = sb.from('shift_requests').select('*, staff(name, code)')
-    .gte('date', psStr).lte('date', peStr).order('date').order('start_time');
-  if (adminViewMode === 'date' && filterDate) q = q.eq('date', filterDate);
-  const { data, error } = await q;
-
-  if (error || !data || data.length === 0) {
-    listEl.innerHTML = '<div class="empty-msg">この期間に提出されたシフトはありません。</div>'; return;
-  }
-  adminViewMode === 'date' ? renderAdminDateView(listEl, data) : renderAdminStaffView(listEl, data);
+  renderAdminMatrixView(listEl, requests.data || [], staff.data || [], periodStart, periodEnd);
+  if (staff.data?.length) printButton.style.display = 'inline-block';
 }
 
+let matrixLoadRequest = 0;
 let matrixAllStaff = []; // 直近描画した一覧表のスタッフ一覧（印刷時の除外選択で使用）
 let matrixPrintState = null; // { byDate, periodStart, periodEnd } 印刷時のCanvas描画で使用
 
@@ -2295,11 +2224,13 @@ function renderAdminMatrixView(listEl, data, allStaff, periodStart, periodEnd) {
 
     const cells = closed
       ? allStaff.map(s => `<td class="matrix-cell" data-staff-id="${s.id}"></td>`).join('')
-      : allStaff.map(s => {
+      : allStaff.map((s, index) => {
           const recs = (byDate[dateStr] && byDate[dateStr][s.id]) || [];
           if (recs.length === 0) return `<td class="matrix-cell" data-staff-id="${s.id}"></td>`;
           const text = recs.map(r => `${formatCompactTime(r.start_time)}-${formatCompactTime(r.end_time)}`).join('<br>');
-          return `<td class="matrix-cell" data-staff-id="${s.id}">${text}</td>`;
+          return `<td class="matrix-cell" data-staff-id="${s.id}">
+            <button type="button" class="matrix-edit-btn" data-staff-index="${index}" data-date="${dateStr}">${text}</button>
+          </td>`;
         }).join('');
 
     const dateCellContent = `${d}日<br>（${DOW[dow]}）<br>${closed
@@ -2318,117 +2249,16 @@ function renderAdminMatrixView(listEl, data, allStaff, periodStart, periodEnd) {
         </div>
       </div>
     </div>`;
-}
-
-function renderAdminDateView(listEl, data) {
-  const groups = {};
-  data.forEach(r => { if (!groups[r.date]) groups[r.date] = []; groups[r.date].push(r); });
-  const totalHours = HOUR_END - HOUR_START;
-
-  listEl.innerHTML = Object.entries(groups).map(([date, rows]) => {
-    const d = new Date(date + 'T00:00:00');
-    const label = `${d.getMonth()+1}/${d.getDate()}（${DOW[d.getDay()]}）`;
-
-    // タイムラベル
-    const timeLabels = [];
-    for (let h = HOUR_START; h <= HOUR_END; h += 2) {
-      const pct = (h - HOUR_START) / totalHours * 100;
-      timeLabels.push(`<div style="position:absolute;left:${pct}%;transform:translateX(-50%);font-size:10px;color:#94a3b8">${h}</div>`);
-    }
-    // グリッドライン
-    const gridLines = [];
-    for (let h = HOUR_START; h <= HOUR_END; h++) {
-      const pct = (h - HOUR_START) / totalHours * 100;
-      gridLines.push(`<div class="gantt-grid-line" style="left:${pct}%"></div>`);
-    }
-
-    // スタッフ別にグループ（複数範囲対応）
-    const staffMap = {};
-    rows.forEach(r => {
-      const key = r.staff_id || r.staff?.name || '不明';
-      if (!staffMap[key]) staffMap[key] = { staffId: r.staff_id, name: r.staff?.name || '不明', bars: [] };
-      staffMap[key].bars.push(r);
-    });
-
-    const staffRows = Object.values(staffMap).map(s => {
-      const bars = s.bars.map(r => {
-        const sh = +r.start_time.split(':')[0] + +r.start_time.split(':')[1] / 60;
-        const eh = +r.end_time.split(':')[0] + +r.end_time.split(':')[1] / 60;
-        const left = Math.max(0, (sh - HOUR_START) / totalHours * 100);
-        const width = Math.min(100 - left, (eh - sh) / totalHours * 100);
-        const barColor = r.availability_type === 'or' ? '#10b981' : '#f97316';
-        return `<div class="gantt-bar" style="left:${left}%;width:${width}%;background:${barColor}" title="${r.start_time.slice(0,5)}〜${r.end_time.slice(0,5)}${r.availability_type==='or'?' (どちらか)':''}"></div>`;
-      }).join('');
-      const safeName = s.name.replace(/'/g, "\\'");
-      return `<div class="gantt-row">
-        <div class="gantt-name">
-          <span class="gantt-name-text" title="${s.name}">${s.name}</span>
-          <div class="gantt-actions">
-            <button class="gantt-action-btn" onclick="openAdminEdit('${s.staffId}','${safeName}','${date}','shift_requests')">✏️</button>
-            <button class="gantt-action-btn" onclick="adminDeleteDay('${s.staffId}','${safeName}','${date}','shift_requests')">🗑️</button>
-          </div>
-        </div>
-        <div class="gantt-bar-area">${gridLines.join('')}${bars}</div>
-      </div>`;
-    }).join('');
-
-    const staffCount = Object.keys(staffMap).length;
-    return `<div class="date-group">
-      <div class="date-group-header"><span>${label}（希望 ${staffCount}名）</span>
-        <span>${isClosedDay(date) ? '休業日' : `必要人数の目安 ${staffingTargetForDate(d)}人`}</span></div>
-      <div class="date-group-body">
-        <div class="gantt-wrap"><div class="gantt-inner">
-          <div style="position:relative;height:16px;margin-left:100px;margin-bottom:2px">${timeLabels.join('')}</div>
-          ${staffRows}
-        </div></div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function renderAdminStaffView(listEl, data) {
-  const staffMap = {};
-  data.forEach(r => {
-    const key = `${r.staff_id}`;
-    if (!staffMap[key]) staffMap[key] = { staffId: r.staff_id, name: r.staff?.name || '不明', rows: [] };
-    staffMap[key].rows.push(r);
+  listEl.querySelectorAll('.matrix-edit-btn').forEach(button => {
+    const staff = allStaff[Number(button.dataset.staffIndex)];
+    const date = button.dataset.date;
+    button.setAttribute('aria-label', `${staff.name} ${date} のシフト希望を編集`);
+    button.addEventListener('click', () => openAdminEdit(staff.id, staff.name, date));
   });
-
-  listEl.innerHTML = Object.values(staffMap).map(s => {
-    const dateMap = {};
-    s.rows.forEach(r => {
-      if (!dateMap[r.date]) dateMap[r.date] = [];
-      dateMap[r.date].push(r);
-    });
-    const safeName = s.name.replace(/'/g, "\\'");
-    const dateRows = Object.entries(dateMap).sort((a,b) => a[0].localeCompare(b[0])).map(([date, recs]) => {
-      const d = new Date(date + 'T00:00:00');
-      const label = `${d.getMonth()+1}/${d.getDate()}（${DOW[d.getDay()]}）`;
-      const timeStr = recs.map(r => `${r.start_time.slice(0,5)}〜${r.end_time.slice(0,5)}`).join('、');
-      const latest = recs.reduce((a,b) => ((a.updated_at||'') > (b.updated_at||'') ? a : b), recs[0]);
-      const meta = latest.updated_at ? `更新：${formatDateTime(latest.updated_at)}` : '';
-      return `<div class="staff-date-row">
-        <span class="staff-date-label">${label}</span>
-        <span class="staff-time-label">${timeStr}</span>
-        ${meta ? `<span class="staff-meta-label">${meta}</span>` : ''}
-        <span class="staff-date-actions">
-          <button class="gantt-action-btn" onclick="openAdminEdit('${s.staffId}','${safeName}','${date}','shift_requests')">✏️</button>
-          <button class="gantt-action-btn" onclick="adminDeleteDay('${s.staffId}','${safeName}','${date}','shift_requests')">🗑️</button>
-        </span>
-      </div>`;
-    }).join('');
-    const dayCount = Object.keys(dateMap).length;
-    return `<div class="staff-card">
-      <div class="staff-card-header"><span>${s.name}</span><span class="staff-card-count">${dayCount}日分</span></div>
-      <div class="staff-card-body">${dateRows}</div>
-    </div>`;
-  }).join('');
 }
-
-function clearAdminFilter() { document.getElementById('admin-filter-date').value = ''; loadAdminShifts(); }
 
 // ====== 管理者：希望シフト 編集・削除 ======
-let adminEditTarget = null; // { staffId, staffName, date, table, records }
+let adminEditTarget = null; // { staffId, staffName, date, records }
 
 // ====== 管理者：一覧表（マトリクス）表示中の期間 ======
 let matrixYear = null, matrixMonth = null, matrixHalf = null;
@@ -2436,27 +2266,29 @@ let matrixYear = null, matrixMonth = null, matrixHalf = null;
 // ====== 管理者：代理入力の対象期間 ======
 let proxyYear = null, proxyMonth = null, proxyHalf = null;
 
-// ====== 管理者：シフト作成 ======
-let scheduleYear = null, scheduleMonth = null, scheduleHalf = null;
-let scheduleSlots = {}; // { 'staffId|date': boolean[28] } 各スタッフ×日付の編集中スロット状態
+function deleteAdminEditDay() {
+  const { staffId, staffName, date } = adminEditTarget;
+  closeAdminEditModal();
+  adminDeleteDay(staffId, staffName, date);
+}
 
-async function adminDeleteDay(staffId, staffName, date, table) {
+async function adminDeleteDay(staffId, staffName, date) {
   const d = new Date(date + 'T00:00:00');
   const label = `${d.getMonth()+1}/${d.getDate()}（${DOW[d.getDay()]}）`;
   showDangerModal(
     `${staffName} さんの ${label} のシフトを削除しますか？`,
     async () => {
-      await sb.from(table).delete().eq('staff_id', staffId).eq('date', date);
-      if (table === 'shift_requests') loadAdminShifts(); else loadSchedule();
+      await sb.from('shift_requests').delete().eq('staff_id', staffId).eq('date', date);
+      loadAdminShifts();
     },
     '削除する'
   );
 }
 
-async function openAdminEdit(staffId, staffName, date, table) {
-  const { data } = await sb.from(table)
+async function openAdminEdit(staffId, staffName, date) {
+  const { data } = await sb.from('shift_requests')
     .select('*').eq('staff_id', staffId).eq('date', date).order('start_time');
-  adminEditTarget = { staffId, staffName, date, table, records: (data || []).map(r => ({ ...r })) };
+  adminEditTarget = { staffId, staffName, date, records: (data || []).map(r => ({ ...r })) };
   const d = new Date(date + 'T00:00:00');
   document.getElementById('admin-edit-title').textContent =
     `${staffName}（${d.getMonth()+1}/${d.getDate()}）のシフト編集`;
@@ -2499,18 +2331,18 @@ async function adminEditSave() {
       document.getElementById('admin-edit-msg').innerHTML = '<div class="msg-error">時間が正しくありません（終了は開始より後にしてください）</div>'; return;
     }
   }
-  const { staffId, date, table } = adminEditTarget;
-  await sb.from(table).delete().eq('staff_id', staffId).eq('date', date);
+  const { staffId, date } = adminEditTarget;
+  await sb.from('shift_requests').delete().eq('staff_id', staffId).eq('date', date);
   if (starts.length > 0) {
     const records = starts.map((s, i) => ({
       staff_id: staffId, date,
       start_time: s + ':00', end_time: ends[i] + ':00',
       availability_type: 'and'
     }));
-    await sb.from(table).insert(records);
+    await sb.from('shift_requests').insert(records);
   }
   closeAdminEditModal();
-  if (table === 'shift_requests') loadAdminShifts(); else loadSchedule();
+  loadAdminShifts();
 }
 
 function closeAdminEditModal() {
@@ -2649,206 +2481,6 @@ async function proxySubmit() {
   document.getElementById('proxy-date-list-wrap').style.display = 'none';
   loadAdminShifts();
 }
-
-// ====== シフト作成（shift_schedule） ======
-function renderSchedulePeriodBtns() {
-  const wrap = document.getElementById('schedule-period-btns');
-  if (!wrap) return;
-  const { lowerIdx, upperIdx } = submittedTabBounds();
-  if (scheduleYear === null) {
-    const r = indexToHalfMonth(upperIdx); // デフォルトは最新の提出可能期間
-    scheduleYear = r.y; scheduleMonth = r.m; scheduleHalf = r.half;
-  }
-  wrap.innerHTML = '';
-  for (let idx = lowerIdx; idx <= upperIdx; idx++) {
-    const r = indexToHalfMonth(idx);
-    const isActive = halfMonthIndex(scheduleYear, scheduleMonth, scheduleHalf) === idx;
-    const btn = document.createElement('button');
-    btn.className = 'view-toggle-btn' + (isActive ? ' active' : '');
-    btn.textContent = `${r.m+1}月${r.half===0?'前半':'後半'}`;
-    btn.onclick = () => { scheduleYear = r.y; scheduleMonth = r.m; scheduleHalf = r.half; loadSchedule(); };
-    wrap.appendChild(btn);
-  }
-}
-
-async function loadSchedule() {
-  const listEl = document.getElementById('schedule-list');
-  if (!listEl) return;
-  renderSchedulePeriodBtns();
-  listEl.innerHTML = '<div class="loading-msg">読み込み中...</div>';
-  const periodStart = getPeriodStart(scheduleYear, scheduleMonth, scheduleHalf);
-  const periodEndDay = scheduleHalf === 0 ? 15 : new Date(scheduleYear, scheduleMonth + 1, 0).getDate();
-  const periodEnd = new Date(scheduleYear, scheduleMonth, periodEndDay);
-  const psStr = toDateStr(periodStart), peStr = toDateStr(periodEnd);
-  const { data, error } = await sb.from('shift_schedule').select('*, staff(name, code)')
-    .gte('date', psStr).lte('date', peStr).order('date').order('start_time');
-  if (error || !data || data.length === 0) {
-    listEl.innerHTML = '<div class="empty-msg">この期間のシフトはまだ作成されていません。「希望からコピーして開始」を押してください。</div>'; return;
-  }
-  renderScheduleView(listEl, data);
-}
-
-function timeRangesToSlots(records) {
-  const slots = new Array(TOTAL_SLOTS).fill(false);
-  records.forEach(r => {
-    for (let i = timeToSlot(r.start_time); i < timeToSlot(r.end_time); i++) slots[i] = true;
-  });
-  return slots;
-}
-
-function setupScheduleBarEvents(bar, staffId, date) {
-  const key = staffId + '|' + date;
-  let dragging = false, fillMode = true, lastIdx = -1;
-
-  function getIdx(e) {
-    const rect = bar.getBoundingClientRect();
-    const x = e.touches ? e.touches[0].clientX : e.clientX;
-    return Math.max(0, Math.min(TOTAL_SLOTS - 1, Math.floor((x - rect.left) / rect.width * TOTAL_SLOTS)));
-  }
-  function applySlot(idx) {
-    if (idx === lastIdx) return;
-    lastIdx = idx;
-    scheduleSlots[key][idx] = fillMode;
-    bar.querySelectorAll('.gantt-paint-slot')[idx].classList.toggle('filled', fillMode);
-  }
-  function onDown(e) {
-    e.preventDefault(); dragging = true; lastIdx = -1;
-    const i = getIdx(e);
-    fillMode = !scheduleSlots[key][i];
-    applySlot(i);
-  }
-  function onMove(e) { if (dragging) applySlot(getIdx(e)); }
-  function onUp() { if (dragging) { dragging = false; saveScheduleBar(staffId, date); } }
-
-  bar.addEventListener('mousedown', onDown);
-  window.addEventListener('mousemove', onMove);
-  window.addEventListener('mouseup', onUp);
-  bar.addEventListener('touchstart', onDown, { passive: false });
-  bar.addEventListener('touchmove', e => { e.preventDefault(); onMove(e); }, { passive: false });
-  bar.addEventListener('touchend', onUp);
-
-  bar._cleanup = () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
-}
-
-async function saveScheduleBar(staffId, date) {
-  const key = staffId + '|' + date;
-  const ranges = getTimeRanges(scheduleSlots[key] || []);
-  await sb.from('shift_schedule').delete().eq('staff_id', staffId).eq('date', date);
-  if (ranges.length > 0) {
-    const records = ranges.map(r => ({
-      staff_id: staffId, date,
-      start_time: slotToTime(r.start) + ':00', end_time: slotToTime(r.end) + ':00',
-      availability_type: 'and'
-    }));
-    await sb.from('shift_schedule').insert(records);
-  }
-}
-
-function resetScheduleDay(dateStr) {
-  showDangerModal(
-    `${dateStr} のシフト作成データを希望に戻しますか？\nこの日の作成済みデータは上書きされます。`,
-    async () => {
-      await sb.from('shift_schedule').delete().eq('date', dateStr);
-      const { data } = await sb.from('shift_requests').select('*').eq('date', dateStr);
-      if (data && data.length > 0) {
-        const records = data.map(r => ({ staff_id: r.staff_id, date: r.date, start_time: r.start_time, end_time: r.end_time }));
-        await sb.from('shift_schedule').insert(records);
-      }
-      loadSchedule();
-    },
-    'リセットする'
-  );
-}
-
-function renderScheduleView(listEl, data) {
-  // 再描画前に古いバーのwindowリスナーを解除（蓄積防止）
-  listEl.querySelectorAll('.gantt-paint-track').forEach(el => { if (el._cleanup) el._cleanup(); });
-
-  const groups = {};
-  data.forEach(r => { if (!groups[r.date]) groups[r.date] = []; groups[r.date].push(r); });
-  const totalHours = HOUR_END - HOUR_START;
-
-  listEl.innerHTML = Object.entries(groups).map(([date, rows]) => {
-    const d = new Date(date + 'T00:00:00');
-    const label = `${d.getMonth()+1}/${d.getDate()}（${DOW[d.getDay()]}）`;
-    const timeLabels = [];
-    for (let h = HOUR_START; h <= HOUR_END; h += 2) {
-      const pct = (h - HOUR_START) / totalHours * 100;
-      timeLabels.push(`<div style="position:absolute;left:${pct}%;transform:translateX(-50%);font-size:10px;color:#94a3b8">${h}</div>`);
-    }
-    const gridLines = [];
-    for (let h = HOUR_START; h <= HOUR_END; h++) {
-      const pct = (h - HOUR_START) / totalHours * 100;
-      gridLines.push(`<div class="gantt-grid-line" style="left:${pct}%"></div>`);
-    }
-    const staffMap = {};
-    rows.forEach(r => {
-      const key = r.staff_id || '不明';
-      if (!staffMap[key]) staffMap[key] = { staffId: r.staff_id, name: r.staff?.name || '不明', code: r.staff?.code || '', bars: [] };
-      staffMap[key].bars.push(r);
-    });
-    const staffRows = Object.values(staffMap).sort((a, b) => {
-      const aMin = a.bars.reduce((min, r) => r.start_time < min ? r.start_time : min, a.bars[0].start_time);
-      const bMin = b.bars.reduce((min, r) => r.start_time < min ? r.start_time : min, b.bars[0].start_time);
-      if (aMin !== bMin) return aMin < bMin ? -1 : 1;
-      return String(a.code).localeCompare(String(b.code));
-    }).map(s => {
-      const slotKey = s.staffId + '|' + date;
-      scheduleSlots[slotKey] = timeRangesToSlots(s.bars);
-      const slotsHtml = Array.from({ length: TOTAL_SLOTS }, (_, i) =>
-        `<div class="gantt-paint-slot${scheduleSlots[slotKey][i] ? ' filled' : ''}"></div>`
-      ).join('');
-      const safeName = s.name.replace(/'/g, "\\'");
-      return `<div class="gantt-row">
-        <div class="gantt-name">
-          <span class="gantt-name-text" title="${s.name}">${s.name}</span>
-          <div class="gantt-actions">
-            <button class="gantt-action-btn" onclick="adminDeleteDay('${s.staffId}','${safeName}','${date}','shift_schedule')">🗑️</button>
-          </div>
-        </div>
-        <div class="gantt-bar-area" data-staff-id="${s.staffId}" data-date="${date}">${gridLines.join('')}<div class="gantt-paint-track">${slotsHtml}</div></div>
-      </div>`;
-    }).join('');
-    const staffCount = Object.keys(staffMap).length;
-    return `<div class="date-group">
-      <div class="date-group-header">
-        <span>${label}（${staffCount}名）</span>
-        <button class="gantt-action-btn" onclick="resetScheduleDay('${date}')" title="この日を希望に戻す">↩️</button>
-      </div>
-      <div class="date-group-body">
-        <div class="gantt-wrap"><div class="gantt-inner">
-          <div style="position:relative;height:16px;margin-left:100px;margin-bottom:2px">${timeLabels.join('')}</div>
-          ${staffRows}
-        </div></div>
-      </div>
-    </div>`;
-  }).join('');
-
-  listEl.querySelectorAll('.gantt-bar-area[data-staff-id]').forEach(el => {
-    setupScheduleBarEvents(el.querySelector('.gantt-paint-track'), el.dataset.staffId, el.dataset.date);
-  });
-}
-
-async function copyFromRequests() {
-  const periodStart = getPeriodStart(scheduleYear, scheduleMonth, scheduleHalf);
-  const periodEndDay = scheduleHalf === 0 ? 15 : new Date(scheduleYear, scheduleMonth + 1, 0).getDate();
-  const psStr = toDateStr(periodStart), peStr = toDateStr(new Date(scheduleYear, scheduleMonth, periodEndDay));
-  showDangerModal(
-    `選択中の期間（${scheduleMonth+1}月${scheduleHalf===0?'前半':'後半'}）のシフト希望データをコピーします。\n既存の作成データは上書きされます。`,
-    async () => {
-      await sb.from('shift_schedule').delete().gte('date', psStr).lte('date', peStr);
-      const { data } = await sb.from('shift_requests').select('*').gte('date', psStr).lte('date', peStr);
-      if (data && data.length > 0) {
-        const records = data.map(r => ({ staff_id: r.staff_id, date: r.date, start_time: r.start_time, end_time: r.end_time }));
-        await sb.from('shift_schedule').insert(records);
-      }
-      loadSchedule();
-    },
-    'コピーする'
-  );
-}
-
-function resetSchedule() { copyFromRequests(); }
 
 // ====== 管理者：スタッフ登録 ======
 async function registerStaff() {
