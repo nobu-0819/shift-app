@@ -117,6 +117,8 @@
     .date-group-body { border: 1.5px solid #e2e8f0; border-top: none; border-radius: 0 0 10px 10px; }
     .shift-row { display: flex; align-items: center; padding: 10px 14px; border-bottom: 1px solid #f1f5f9; gap: 10px; }
     .shift-row:last-child { border-bottom: none; }
+    .date-group-header { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; }
+    .staffing-note { margin: 6px 0 12px; color: #475569; font-size: 13px; }
     .shift-row .sname { font-weight: bold; min-width: 70px; font-size: 14px; }
     .shift-row .stime { font-size: 13px; color: #2563eb; font-weight: bold; }
 
@@ -262,6 +264,7 @@
     <div id="admin-tab-shifts">
       <div class="card">
         <div class="section-title">📋 シフト希望一覧（日付別）</div>
+        <p class="staffing-note">必要人数は曜日ごとの目安です。予約による増減やヘルプの可否は、責任者に確認してください。</p>
         <div class="filter-row">
           <input type="date" id="admin-filter-date" onchange="loadAdminShifts()" />
           <button onclick="clearAdminFilter()">全表示</button>
@@ -316,6 +319,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const DOW = ['日','月','火','水','木','金','土'];
+const STAFFING_TARGET_BY_WEEKDAY = [9, 4, 4, 4, 4, 8, 11];
 const HOUR_START = 9, HOUR_END = 23, MINS_PER_SLOT = 30;
 const TOTAL_SLOTS = (HOUR_END - HOUR_START) * (60 / MINS_PER_SLOT); // 28
 
@@ -821,20 +825,25 @@ async function loadAdminShifts() {
   let q = sb.from('shift_requests').select('*, staff(name)').order('date').order('start_time');
   if (filterDate) q = q.eq('date', filterDate);
   const { data, error } = await q;
-  if (error || !data || data.length === 0) { listEl.innerHTML = '<div class="empty-msg">提出されたシフトはありません。</div>'; return; }
+  if (error) { listEl.innerHTML = '<div class="empty-msg">シフト希望を読み込めませんでした。</div>'; return; }
+  if (!filterDate && !data?.length) { listEl.innerHTML = '<div class="empty-msg">提出されたシフトはありません。</div>'; return; }
 
-  const groups = {};
-  data.forEach(r => { if (!groups[r.date]) groups[r.date] = []; groups[r.date].push(r); });
+  const groups = filterDate ? { [filterDate]: [] } : {};
+  (data ?? []).forEach(r => { if (!groups[r.date]) groups[r.date] = []; groups[r.date].push(r); });
 
   listEl.innerHTML = Object.entries(groups).map(([date, rows]) => {
     const d = new Date(date + 'T00:00:00');
     const label = `${d.getMonth()+1}/${d.getDate()}（${DOW[d.getDay()]}）`;
+    const target = STAFFING_TARGET_BY_WEEKDAY[d.getDay()];
     const rowsHtml = rows.map(r => `
       <div class="shift-row">
         <span class="sname">${r.staff?.name || '不明'}</span>
         <span class="stime">${rangesToDisplayText(r.slots_data)}</span>
       </div>`).join('');
-    return `<div class="date-group"><div class="date-group-header">${label}</div><div class="date-group-body">${rowsHtml}</div></div>`;
+    return `<div class="date-group">
+      <div class="date-group-header"><span>${label}</span><span>必要人数の目安 ${target}人</span></div>
+      <div class="date-group-body">${rowsHtml || '<div class="empty-msg">提出されたシフトはありません。</div>'}</div>
+    </div>`;
   }).join('');
 }
 
