@@ -540,8 +540,8 @@
     </div>
 
     <div class="admin-tabs">
-      <button class="admin-tab active" onclick="showAdminTab('deadline')">📅 期限設定</button>
-      <button class="admin-tab" onclick="showAdminTab('shifts')">📋 シフト希望一覧</button>
+      <button class="admin-tab active" onclick="showAdminTab('shifts')">📋 シフト希望一覧</button>
+      <button class="admin-tab" onclick="showAdminTab('deadline')">📅 期限設定</button>
       <button class="admin-tab" onclick="showAdminTab('proxy')">✏️ 代理入力</button>
       <button class="admin-tab" onclick="showAdminTab('staff')">👥 スタッフ管理</button>
       <button class="admin-tab" onclick="showAdminTab('holiday')">🎌 特別営業日</button>
@@ -798,7 +798,7 @@ function showPage(p) {
   document.getElementById('page-' + p).classList.add('active');
   document.querySelectorAll('.tab-btn')[p === 'staff' ? 0 : 1].classList.add('active');
   if (p === 'admin') {
-    showAdminTab('deadline');
+    showAdminTab('shifts');
     loadStaffList(); loadProxyStaffSelect(); loadAdminDashboard();
     autoCleanupOldData();
     const b = document.getElementById('pending-banner'); if (b) b.style.display = 'none';
@@ -825,7 +825,7 @@ function showAdminTab(tab) {
     document.getElementById('admin-tab-' + t).style.display = t === tab ? 'block' : 'none';
   });
   document.querySelectorAll('.admin-tab').forEach((e, i) => {
-    e.classList.toggle('active', ['deadline','shifts','proxy','staff','holiday','announce'][i] === tab);
+    e.classList.toggle('active', ['shifts','deadline','proxy','staff','holiday','announce'][i] === tab);
   });
   if (tab === 'staff') loadStaffList();
   if (tab === 'shifts') loadAdminShifts();
