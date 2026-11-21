@@ -101,11 +101,9 @@ Deno.serve(async (request) => {
   if (action === "register") {
     const name = typeof input.name === "string" ? input.name.trim() : "";
     const code = typeof input.code === "string" ? input.code.trim() : "";
-    const role = input.role;
-    if (!name || name.length > 100 || !/^[0-9]{1,10}$/.test(code)
-      || !["staff", "viewer", "admin"].includes(role)) return reply({ error: "invalid_staff" }, 400);
+    if (!name || name.length > 100 || !/^[0-9]{1,10}$/.test(code)) return reply({ error: "invalid_staff" }, 400);
     const { data, error } = await db.from("staff").insert({
-      name, code, is_admin: role === "admin", is_external_viewer: role === "viewer"
+      name, code, is_admin: false, is_external_viewer: false
     }).select("id").single();
     if (error) return reply({ error: "staff_registration_failed" }, 409);
     target = String(data.id);

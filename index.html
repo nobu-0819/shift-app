@@ -579,12 +579,6 @@
             <label style="font-size:13px;color:#64748b;display:block;margin-bottom:4px">② スタッフコード（ログイン時に使う番号）</label>
             <input type="text" id="new-staff-code" placeholder="例：001" style="max-width:120px" />
           </div>
-          <label for="new-staff-role">権限</label>
-          <select id="new-staff-role">
-            <option value="staff">一般スタッフ</option>
-            <option value="viewer">他店社員（閲覧・印刷のみ）</option>
-            <option value="admin">管理者</option>
-          </select>
           <button class="primary-btn" onclick="registerStaff()" style="margin-top:4px">登録する</button>
         </div>
         <div id="staff-register-msg"></div>
@@ -2489,14 +2483,12 @@ async function registerStaff() {
   const name = document.getElementById('new-staff-name').value.trim();
   const code = document.getElementById('new-staff-code').value.trim();
   const msgEl = document.getElementById('staff-register-msg');
-  const roleSelect = document.getElementById('new-staff-role');
-  const role = roleSelect.value;
   if (!name || !code) { msgEl.innerHTML = '<div class="msg-error">名前とコードを両方入力してください。</div>'; return; }
   if (/^\d+$/.test(name)) { msgEl.innerHTML = '<div class="msg-error">名前に数字だけが入力されています。名前とコードが逆になっていませんか？</div>'; return; }
   showDangerModal(
-    `以下の内容で登録します。\n\n名前：${name}\nコード：${code}\n権限：${roleSelect.selectedOptions[0].textContent}\n\n間違いありませんか？`,
+    `以下の内容で登録します。\n\n名前：${name}\nコード：${code}\n\n間違いありませんか？`,
     async () => {
-      const { data, error } = await sb.functions.invoke('nikusho-accounts', { body: { action: 'register', name, code, role } });
+      const { data, error } = await sb.functions.invoke('nikusho-accounts', { body: { action: 'register', name, code } });
       if (error) {
         msgEl.textContent = '登録に失敗しました。コードが重複していないか確認してください。';
         loadStaffList();
@@ -2504,7 +2496,6 @@ async function registerStaff() {
         msgEl.textContent = `登録しました。本人にコード ${data.staffCode} を渡してください。初回に本人がパスワードを設定できます。`;
         document.getElementById('new-staff-name').value = '';
         document.getElementById('new-staff-code').value = '';
-        roleSelect.value = 'staff';
         loadStaffList();
       }
     },
