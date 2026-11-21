@@ -39,6 +39,9 @@
     .code-box p { color: #64748b; margin-bottom: 12px; font-size: 14px; line-height: 1.6; }
     .code-input { font-size: 28px; letter-spacing: 6px; text-align: center; width: 180px; padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none; }
     .code-input:focus { border-color: #1d4ed8; }
+    .viewer-only { display:none; }
+    body.is-viewer .viewer-only { display:block; }
+    body.is-viewer .admin-write, body.is-viewer #page-admin .del-btn { display:none; }
     .pin-input { font-size: 28px; letter-spacing: 10px; text-align: center; width: 160px; padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none; margin-top: 10px; }
     .pin-input:focus { border-color: #1d4ed8; }
     .code-btn { margin-top: 14px; padding: 13px 40px; background: #1d4ed8; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; touch-action: manipulation; }
@@ -138,7 +141,17 @@
     .staff-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; margin-bottom: 8px; gap: 8px; }
     .staff-list-item .info { font-size: 14px; flex: 1; }
     .staff-list-item .code-badge { font-size: 13px; color: #64748b; background: #f1f5f9; padding: 3px 10px; border-radius: 6px; font-weight: bold; margin-left: 8px; }
-    .staff-list-item .btn-group { display: flex; gap: 6px; }
+    .staff-list-item .btn-group { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .staff-role-label, .staff-password-status { font-size: 11px; margin-left: 6px; }
+    .staff-role-label { color: #7c3aed; }
+    .staff-password-status { color: #059669; }
+    .staff-viewer-btn { color: #0369a1; border-color: #7dd3fc; }
+    .staff-list-item button:disabled { opacity: .45; cursor: default; }
+    @media (max-width: 600px) {
+      .staff-list-item { flex-wrap: wrap; }
+      .staff-list-item .info { flex-basis: 100%; }
+      .staff-list-item .btn-group { justify-content: flex-start; }
+    }
     .reset-pin-btn { background: none; border: 1.5px solid #fbbf24; color: #d97706; border-radius: 8px; padding: 7px 10px; font-size: 12px; cursor: pointer; white-space: nowrap; touch-action: manipulation; }
     .admin-toggle-btn { background: none; border: 1.5px solid #a78bfa; color: #7c3aed; border-radius: 8px; padding: 7px 10px; font-size: 12px; cursor: pointer; white-space: nowrap; touch-action: manipulation; }
     .admin-toggle-btn.is-admin { border-color: #6ee7b7; color: #059669; }
@@ -388,39 +401,27 @@
   <div class="container">
 
     <div class="card" id="code-card">
-      <!-- ステップ1: コード入力 -->
-      <div id="step-code" class="code-box">
-        <p>スタッフコードを入力してください</p>
-        <input type="number" class="code-input" id="staff-code-input" placeholder="000" />
-        <br/>
-        <button class="code-btn" id="code-next-btn">次へ →</button>
-        <div id="login-msg"></div>
-      </div>
-
-      <!-- ステップ2a: PIN設定（初回） -->
-      <div id="step-set-pin" class="code-box" style="display:none">
-        <div class="step-name" id="set-pin-name"></div>
-        <p>🔐 はじめてのログインです<br/>4桁のパスワードを設定してください</p>
-        <input type="password" inputmode="numeric" class="pin-input" id="pin-set-1" placeholder="••••" maxlength="4" />
-        <br/>
-        <input type="password" inputmode="numeric" class="pin-input" id="pin-set-2" placeholder="確認入力" maxlength="4" />
-        <br/>
-        <button class="code-btn" id="set-pin-btn">パスワードを設定する</button>
-        <button class="back-link" id="back-from-set">← コード入力に戻る</button>
-        <div id="set-pin-msg"></div>
-      </div>
-
-      <!-- ステップ2b: PIN入力（2回目以降） -->
-      <div id="step-enter-pin" class="code-box" style="display:none">
-        <div class="step-name" id="enter-pin-name"></div>
-        <p>パスワードを入力してください</p>
-        <p style="font-size:12px;color:#94a3b8;margin-top:4px">パスワードを忘れた場合は社員に連絡してください</p>
-        <input type="password" inputmode="numeric" class="pin-input" id="pin-input" placeholder="••••" maxlength="4" />
-        <br/>
-        <button class="code-btn" id="verify-pin-btn">ログイン</button>
-        <button class="back-link" id="back-from-enter">← コード入力に戻る</button>
-        <div id="enter-pin-msg"></div>
-      </div>
+      <form id="staff-login" class="code-box">
+        <label for="staff-code-input">スタッフコード</label><br>
+        <input type="text" inputmode="numeric" class="code-input" id="staff-code-input" autocomplete="username" required>
+        <br><label for="login-password">パスワード（数字4桁）</label><br>
+        <input type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" class="pin-input" id="login-password" autocomplete="current-password" required style="letter-spacing:normal;font-size:16px">
+        <br><button class="code-btn" type="submit">ログイン</button>
+        <div id="login-msg" role="status"></div>
+        <button type="button" class="back-link" id="open-password-setup">初回・再設定はこちら</button>
+      </form>
+      <form class="code-box" id="initial-password" hidden>
+        <p>スタッフコードと、ご自身で決めた数字4桁のパスワードを入力してください。</p>
+        <label for="setup-staff-code">スタッフコード</label>
+        <input id="setup-staff-code" type="text" inputmode="numeric" autocomplete="username" pattern="[0-9]{1,10}" required>
+        <label for="new-password">新しいパスワード（数字4桁）</label>
+        <input id="new-password" type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" autocomplete="new-password" required>
+        <label for="new-password-confirm">新しいパスワード（確認）</label>
+        <input id="new-password-confirm" type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" autocomplete="new-password" required>
+        <button class="code-btn" type="submit">パスワードを設定する</button>
+        <div id="setup-message" role="status"></div>
+        <button type="button" class="back-link" id="close-password-setup">ログインに戻る</button>
+      </form>
     </div>
 
     <!-- シフト入力（ログイン後） -->
@@ -495,26 +496,21 @@
           <div style="display:flex;flex-direction:column;gap:10px;max-width:280px;margin:0 auto">
             <div>
               <label style="font-size:13px;color:#64748b;display:block;margin-bottom:4px">現在のパスワード</label>
-              <input type="password" inputmode="numeric" class="pin-input" id="change-pin-current" placeholder="••••" maxlength="4" style="width:100%" />
+              <input type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" class="pin-input" id="change-pin-current" placeholder="••••" style="width:100%;letter-spacing:normal;font-size:16px" />
             </div>
             <div>
               <label style="font-size:13px;color:#64748b;display:block;margin-bottom:4px">新しいパスワード</label>
-              <input type="password" inputmode="numeric" class="pin-input" id="change-pin-new1" placeholder="••••" maxlength="4" style="width:100%" />
+              <input type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" class="pin-input" id="change-pin-new1" placeholder="••••" style="width:100%;letter-spacing:normal;font-size:16px" />
             </div>
             <div>
               <label style="font-size:13px;color:#64748b;display:block;margin-bottom:4px">新しいパスワード（確認）</label>
-              <input type="password" inputmode="numeric" class="pin-input" id="change-pin-new2" placeholder="••••" maxlength="4" style="width:100%" />
+              <input type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" class="pin-input" id="change-pin-new2" placeholder="••••" style="width:100%;letter-spacing:normal;font-size:16px" />
             </div>
             <button class="primary-btn" id="change-pin-btn" style="margin-top:4px">パスワードを変更する</button>
             <div id="change-pin-msg"></div>
           </div>
         </div>
 
-        <div class="card" style="margin-top:0">
-          <div class="section-title">📱 このデバイスの設定</div>
-          <p style="font-size:13px;color:#64748b;margin-bottom:14px" id="device-save-status"></p>
-          <button class="outline-danger-btn" id="forget-device-btn" style="margin-top:0">このデバイスの記憶を削除する</button>
-        </div>
       </div>
     </div>
   </div>
@@ -549,6 +545,7 @@
     </div>
 
     <div id="admin-tab-shifts">
+      <p class="viewer-only">他店社員 · 閲覧・印刷のみ</p>
       <div class="card">
         <div class="section-title">📋 シフト希望一覧</div>
         <div id="matrix-period-btns" class="view-toggle" style="flex-wrap:wrap"></div>
@@ -558,7 +555,8 @@
     </div>
 
     <div id="admin-tab-proxy" style="display:none">
-      <div class="card">
+      <p class="viewer-only">代理入力は管理者が行います。提出済みの内容はシフト希望一覧で確認できます。</p>
+      <div class="card admin-write">
         <div class="section-title">✏️ 代理入力（紙で提出されたシフトを入力）</div>
         <p style="font-size:13px;color:#64748b;margin-bottom:14px">紙で提出されたスタッフのシフト希望をここから入力できます。</p>
         <div style="display:flex;flex-direction:column;gap:10px">
@@ -582,7 +580,7 @@
     <div id="admin-tab-staff" style="display:none">
       <div class="card">
         <div class="section-title">👥 スタッフ登録</div>
-        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+        <div class="admin-write" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
           <div>
             <label style="font-size:13px;color:#64748b;display:block;margin-bottom:4px">① 名前（フルネーム）</label>
             <input type="text" id="new-staff-name" placeholder="例：山田 太郎" style="width:100%" />
@@ -602,7 +600,7 @@
       <div class="card">
         <div class="section-title">📅 シフト提出期限の設定</div>
         <p style="font-size:13px;color:#64748b;margin-bottom:16px">シフト対象期間の開始日と締切日を設定してください。</p>
-        <div class="deadline-form">
+        <div class="deadline-form admin-write">
           <div class="deadline-row">
             <label>対象期間の開始日</label>
             <input type="date" id="dl-period-start" />
@@ -626,7 +624,7 @@
         <p style="font-size:13px;color:#64748b;margin-bottom:16px">
           お盆など、平日でも営業時間が変わる日を「休日扱い」に設定できます。設定すると、その日はシフト入力の「よくあるパターン」に休日用の選択肢（ランチ営業9:00〜15:00、16:00開始の夕方シフトなど）が表示され、各画面でも休日として色分け表示されます。年末年始など、まったく営業しない日は「休業日」に設定してください。その日はスタッフのシフト入力ができなくなります。
         </p>
-        <div class="deadline-form">
+        <div class="deadline-form admin-write">
           <div class="deadline-row">
             <label>開始日</label>
             <input type="date" id="sh-date" />
@@ -665,7 +663,7 @@
         <p style="font-size:13px;color:#64748b;margin-bottom:16px">
           スタッフのシフト入力画面の上部に表示されるメッセージを掲示できます。例：「8月11日〜16日のお盆期間は時給がアップします」
         </p>
-        <div class="deadline-form">
+        <div class="deadline-form admin-write">
           <div class="deadline-row" style="flex-direction:column;align-items:stretch">
             <label>メッセージ</label>
             <textarea id="announce-text" rows="3" style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:8px;font-size:14px;font-family:inherit;resize:vertical" placeholder="例：8月11日〜16日のお盆期間は時給がアップします"></textarea>
@@ -688,7 +686,9 @@
 <script>
 const SUPABASE_URL = 'https://ebgayoclmenbursqjiyz.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImViZ2F5b2NsbWVuYnVyc3FqaXl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3ODk0MDYsImV4cCI6MjA5NjM2NTQwNn0.rbweZuhZ2K_vlbF6lQcmoxxIhbLshsWcYZgo27WvdlA';
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { storage: window.sessionStorage, detectSessionInUrl: false }
+});
 
 const DOW = ['日','月','火','水','木','金','土'];
 const STAFFING_TARGET_BY_WEEKDAY = [9, 4, 4, 4, 4, 8, 11];
@@ -730,7 +730,6 @@ function isClosedDay(dateStr) {
 }
 
 let currentStaff = null;
-let tempStaff = null;
 // submittedDates: { 'YYYY-MM-DD': [{id, start_time, end_time, updated_at}, ...] }
 let selectedDates = {};
 let submittedDates = {};
@@ -792,15 +791,15 @@ async function autoCleanupOldData() {
 
 // ====== ページ切替 ======
 function showPage(p) {
-  if (p === 'admin' && (!currentStaff || !currentStaff.is_admin)) return;
+  if (p === 'admin' && !(currentStaff?.is_admin || currentStaff?.is_external_viewer)) return;
+  if (p === 'staff' && currentStaff?.is_external_viewer) return;
   document.querySelectorAll('.page').forEach(e => e.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
   document.getElementById('page-' + p).classList.add('active');
   document.querySelectorAll('.tab-btn')[p === 'staff' ? 0 : 1].classList.add('active');
   if (p === 'admin') {
     showAdminTab('shifts');
-    loadStaffList(); loadProxyStaffSelect(); loadAdminDashboard();
-    autoCleanupOldData();
+    if (currentStaff.is_admin) autoCleanupOldData();
     const b = document.getElementById('pending-banner'); if (b) b.style.display = 'none';
   } else {
     updatePendingBanner();
@@ -816,7 +815,6 @@ function showStaffTab(tab) {
   document.getElementById('sub-tab-submitted').classList.toggle('active', tab === 'submitted');
   document.getElementById('sub-tab-settings').classList.toggle('active', tab === 'settings');
   if (tab === 'submitted') { subInitialized = false; loadSubmittedShifts(); }
-  if (tab === 'settings') renderDeviceSaveStatus();
 }
 
 // ====== 管理者タブ切替 ======
@@ -828,127 +826,48 @@ function showAdminTab(tab) {
     e.classList.toggle('active', ['shifts','deadline','proxy','staff','holiday','announce'][i] === tab);
   });
   if (tab === 'staff') loadStaffList();
+  else document.getElementById('staff-register-msg').textContent = '';
   if (tab === 'shifts') loadAdminShifts();
-  if (tab === 'proxy') loadProxyStaffSelect();
+  if (tab === 'proxy' && currentStaff?.is_admin) loadProxyStaffSelect();
   if (tab === 'deadline') loadDeadlineList();
   if (tab === 'holiday') loadSpecialHolidayList();
   if (tab === 'announce') loadAnnouncementAdminList();
   loadAdminDashboard();
 }
 
-// ====== ログアウト ======
-function logout() {
-  localStorage.removeItem('shift_saved_code');
-  localStorage.removeItem('shift_saved_pin');
-  document.getElementById('admin-tab-btn').style.display = 'none';
-  document.getElementById('staff-tab-btn').style.display = 'inline-block';
-  currentStaff = null; tempStaff = null;
-  selectedDates = {}; submittedDates = {};
-  document.getElementById('step-set-pin').style.display = 'none';
-  document.getElementById('step-enter-pin').style.display = 'none';
-  document.getElementById('step-code').style.display = 'block';
-  document.getElementById('staff-code-input').value = '';
-  document.getElementById('pin-set-1').value = '';
-  document.getElementById('pin-set-2').value = '';
-  document.getElementById('pin-input').value = '';
-  document.getElementById('login-msg').innerHTML = '';
-  document.getElementById('set-pin-msg').innerHTML = '';
-  document.getElementById('enter-pin-msg').innerHTML = '';
-  document.getElementById('code-card').style.display = 'block';
-  document.getElementById('staff-main').style.display = 'none';
-  document.getElementById('logout-btn').style.display = 'none';
-  showStaffTab('input');
+async function logout() {
+  const { error } = await sb.auth.signOut({ scope: 'local' });
+  if (!error) location.reload();
+  else alert('ログアウトできませんでした。再度お試しください。');
 }
 document.getElementById('logout-btn').addEventListener('click', logout);
-document.getElementById('logout-btn').addEventListener('touchend', function(e) { e.preventDefault(); logout(); });
 
-// ====== ログイン：ステップ1 コード入力 ======
-async function loginWithCode() {
-  const code = document.getElementById('staff-code-input').value.trim();
-  const msgEl = document.getElementById('login-msg');
-  if (!code) { msgEl.innerHTML = '<div class="msg-error">コードを入力してください</div>'; return; }
-  msgEl.innerHTML = '<div style="color:#94a3b8;font-size:14px;margin-top:8px">確認中...</div>';
+const loginForm = document.getElementById('staff-login');
+const setupForm = document.getElementById('initial-password');
 
-  const { data, error } = await sb.from('staff').select('*').eq('code', code).maybeSingle();
-  if (error || !data) {
-    msgEl.innerHTML = '<div class="msg-error">コードが見つかりません。管理者に確認してください。</div>';
-    return;
-  }
-  tempStaff = data;
-  document.getElementById('step-code').style.display = 'none';
-
-  const pinIsSet = data.pin !== null && data.pin !== undefined && data.pin !== '';
-  if (!pinIsSet) {
-    document.getElementById('set-pin-name').textContent = `👋 ${data.name} さん`;
-    document.getElementById('step-set-pin').style.display = 'block';
-    setTimeout(() => document.getElementById('pin-set-1').focus(), 100);
-  } else {
-    document.getElementById('enter-pin-name').textContent = `👋 ${data.name} さん`;
-    document.getElementById('step-enter-pin').style.display = 'block';
-    setTimeout(() => document.getElementById('pin-input').focus(), 100);
-  }
-}
-
-function backToCode() {
-  tempStaff = null;
-  document.getElementById('step-set-pin').style.display = 'none';
-  document.getElementById('step-enter-pin').style.display = 'none';
-  document.getElementById('step-code').style.display = 'block';
-  document.getElementById('staff-code-input').value = '';
-  document.getElementById('login-msg').innerHTML = '';
-  document.getElementById('pin-set-1').value = '';
-  document.getElementById('pin-set-2').value = '';
-  document.getElementById('pin-input').value = '';
-  document.getElementById('set-pin-msg').innerHTML = '';
-  document.getElementById('enter-pin-msg').innerHTML = '';
-}
-
-// ====== ログイン：ステップ2a PIN設定 ======
-async function setPin() {
-  const pin1 = document.getElementById('pin-set-1').value.trim();
-  const pin2 = document.getElementById('pin-set-2').value.trim();
-  const msgEl = document.getElementById('set-pin-msg');
-  if (!pin1) { msgEl.innerHTML = '<div class="msg-error">パスワードを入力してください</div>'; return; }
-  if (pin1.length !== 4 || !/^\d{4}$/.test(pin1)) { msgEl.innerHTML = '<div class="msg-error">4桁の数字で入力してください</div>'; return; }
-  if (pin1 !== pin2) { msgEl.innerHTML = '<div class="msg-error">パスワードが一致しません。もう一度確認してください</div>'; return; }
-
-  const { error } = await sb.from('staff').update({ pin: pin1 }).eq('id', tempStaff.id);
-  if (error) { msgEl.innerHTML = '<div class="msg-error">設定に失敗しました。もう一度お試しください</div>'; return; }
-
-  tempStaff.pin = pin1;
-  completeLogin();
-}
-
-// ====== ログイン：ステップ2b PIN確認 ======
-async function verifyPin() {
-  const pin = document.getElementById('pin-input').value.trim();
-  const msgEl = document.getElementById('enter-pin-msg');
-  if (!pin) { msgEl.innerHTML = '<div class="msg-error">パスワードを入力してください</div>'; return; }
-  if (pin !== String(tempStaff.pin)) {
-    msgEl.innerHTML = '<div class="msg-error">パスワードが違います</div>';
-    document.getElementById('pin-input').value = '';
-    return;
-  }
-  completeLogin();
-}
-
-async function completeLogin() {
-  currentStaff = tempStaff;
-  tempStaff = null;
-  // このデバイスに記憶
-  localStorage.setItem('shift_saved_code', currentStaff.code);
-  localStorage.setItem('shift_saved_pin', currentStaff.pin);
-  document.getElementById('code-card').style.display = 'none';
-  document.getElementById('staff-main').style.display = 'block';
-  document.getElementById('staff-greeting').textContent = `👋 こんにちは、${currentStaff.name} さん`;
+async function loadAccount() {
+  const { data: account, error } = await sb.rpc('nikusho_current_account');
+  if (error || !account) return false;
   document.getElementById('logout-btn').style.display = 'inline-block';
-  if (currentStaff.is_admin) {
-    document.getElementById('admin-tab-btn').style.display = 'inline-block';
-  } else {
-    document.getElementById('staff-tab-btn').style.display = 'none';
+  if (account.password_setup_required) {
+    showPasswordSetup(String(account.code));
+    return true;
   }
+  currentStaff = account;
+  document.getElementById('code-card').style.display = 'none';
+  const adminButton = document.getElementById('admin-tab-btn');
+  document.body.classList.toggle('is-viewer', account.is_external_viewer);
+  if (account.is_admin || account.is_external_viewer) adminButton.style.display = 'inline-block';
+  if (!account.is_admin) document.getElementById('staff-tab-btn').style.display = 'none';
   await loadActivePeriod();
   await loadCustomHolidays();
+  if (account.is_external_viewer) {
+    adminButton.textContent = '閲覧・印刷';
+    showPage('admin');
+    return true;
+  }
+  document.getElementById('staff-main').style.display = 'block';
+  document.getElementById('staff-greeting').textContent = `👋 こんにちは、${account.name} さん`;
   calYear = activePeriodStart.getFullYear();
   calMonth = activePeriodStart.getMonth();
   calHalf = activePeriodStart.getDate() === 1 ? 0 : 1;
@@ -957,17 +876,97 @@ async function completeLogin() {
   await loadSkipStatus();
   await loadAnnouncements();
   renderDateList();
+  return true;
 }
 
-// イベントリスナー
-document.getElementById('code-next-btn').addEventListener('click', loginWithCode);
-document.getElementById('staff-code-input').addEventListener('keydown', e => { if (e.key === 'Enter') loginWithCode(); });
-document.getElementById('set-pin-btn').addEventListener('click', setPin);
-document.getElementById('pin-set-2').addEventListener('keydown', e => { if (e.key === 'Enter') setPin(); });
-document.getElementById('verify-pin-btn').addEventListener('click', verifyPin);
-document.getElementById('pin-input').addEventListener('keydown', e => { if (e.key === 'Enter') verifyPin(); });
-document.getElementById('back-from-set').addEventListener('click', backToCode);
-document.getElementById('back-from-enter').addEventListener('click', backToCode);
+loginForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  const code = document.getElementById('staff-code-input').value.trim();
+  const password = document.getElementById('login-password');
+  const message = document.getElementById('login-msg');
+  const button = loginForm.querySelector('button');
+  button.disabled = true;
+  try {
+    const { data, error } = await sb.functions.invoke('nikusho-accounts', {
+      body: { action: 'login', code, password: password.value }
+    });
+    const session = (!error && data?.access_token && data?.refresh_token)
+      ? await sb.auth.setSession({ access_token: data.access_token, refresh_token: data.refresh_token })
+      : null;
+    if (!session || session.error || !(await loadAccount())) {
+      message.textContent = 'コードとパスワードを確認してください。初回や再設定は「初回・再設定はこちら」を押してください。';
+    } else password.value = '';
+  } catch {
+    message.textContent = '通信に失敗しました。再度お試しください。';
+  } finally {
+    button.disabled = false;
+  }
+});
+
+async function changeAccountPassword(currentPassword, password, confirmation, message) {
+  if (!/^[0-9]{4}$/.test(currentPassword) || !/^[0-9]{4}$/.test(password) || password !== confirmation || currentPassword === password) {
+    message.textContent = '現在と異なる数字4桁を入力し、確認欄にも同じ数字を入力してください。';
+    return;
+  }
+  const { error } = await sb.functions.invoke('nikusho-accounts', {
+    body: { action: 'change', currentPassword, password }
+  });
+  if (error) {
+    message.textContent = '変更できませんでした。現在のパスワードを確認し、続く場合は管理者へ連絡してください。';
+    return;
+  }
+  await logout();
+}
+
+function showPasswordSetup(code) {
+  document.getElementById('setup-staff-code').value = code;
+  document.getElementById('setup-message').textContent = '';
+  loginForm.hidden = true;
+  setupForm.hidden = false;
+  document.getElementById(code ? 'new-password' : 'setup-staff-code').focus();
+}
+
+document.getElementById('open-password-setup').addEventListener('click', () => {
+  showPasswordSetup(document.getElementById('staff-code-input').value.trim());
+});
+document.getElementById('close-password-setup').addEventListener('click', () => {
+  setupForm.reset();
+  setupForm.hidden = true;
+  loginForm.hidden = false;
+});
+
+setupForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  const button = setupForm.querySelector('[type="submit"]');
+  const message = document.getElementById('setup-message');
+  const code = document.getElementById('setup-staff-code').value.trim();
+  const password = document.getElementById('new-password').value;
+  const confirmation = document.getElementById('new-password-confirm').value;
+  if (password !== confirmation || !/^[0-9]{4}$/.test(password)) {
+    message.textContent = '数字4桁を入力し、確認欄にも同じ数字を入力してください。';
+    return;
+  }
+  button.disabled = true;
+  try {
+    const { error } = await sb.functions.invoke('nikusho-accounts', {
+      body: { action: 'activate', code, password }
+    });
+    if (error) {
+      message.textContent = '設定できませんでした。スタッフコードを確認してください。設定済みの場合は、ログインするか管理者にリセットを依頼してください。';
+      return;
+    }
+    await sb.auth.signOut({ scope: 'local' });
+    setupForm.reset();
+    setupForm.hidden = true;
+    loginForm.hidden = false;
+    document.getElementById('staff-code-input').value = code;
+    document.getElementById('login-password').value = '';
+    document.getElementById('login-msg').textContent = '設定しました。今決めたパスワードでログインしてください。';
+    document.getElementById('login-password').focus();
+  } finally {
+    button.disabled = false;
+  }
+});
 
 // ====== 期限の取得 ======
 async function loadCurrentDeadline() {
@@ -1947,7 +1946,7 @@ async function loadAdminShifts() {
 
   const [requests, staff] = await Promise.all([
     sb.from('shift_requests').select('*').gte('date', psStr).lte('date', peStr).order('date').order('start_time'),
-    sb.from('staff').select('id, name').order('code'),
+    sb.from('staff').select('id, name').eq('is_external_viewer', false).order('name'),
   ]);
   if (request !== matrixLoadRequest) return;
   if (requests.error || staff.error) {
@@ -2174,10 +2173,16 @@ window.addEventListener('afterprint', () => {
 });
 
 // 氏名を文字数の中間で2行に分割（姓名の区切り情報がないため、見やすさのための簡易分割）
+function escapeHtml(text) {
+  const node = document.createElement('span');
+  node.textContent = text ?? '';
+  return node.innerHTML;
+}
+
 function splitNameTwoLines(name) {
-  if (!name || name.length <= 2) return name;
+  if (!name || name.length <= 2) return escapeHtml(name);
   const mid = Math.ceil(name.length / 2);
-  return name.slice(0, mid) + '<br>' + name.slice(mid);
+  return escapeHtml(name.slice(0, mid)) + '<br>' + escapeHtml(name.slice(mid));
 }
 
 // "09:00"→"9"、"17:30"→"17.5" のような簡潔表記に変換（一覧表セル専用）
@@ -2228,6 +2233,7 @@ function renderAdminMatrixView(listEl, data, allStaff, periodStart, periodEnd) {
           const recs = (byDate[dateStr] && byDate[dateStr][s.id]) || [];
           if (recs.length === 0) return `<td class="matrix-cell" data-staff-id="${s.id}"></td>`;
           const text = recs.map(r => `${formatCompactTime(r.start_time)}-${formatCompactTime(r.end_time)}`).join('<br>');
+          if (!currentStaff?.is_admin) return `<td class="matrix-cell">${text}</td>`;
           return `<td class="matrix-cell" data-staff-id="${s.id}">
             <button type="button" class="matrix-edit-btn" data-staff-index="${index}" data-date="${dateStr}">${text}</button>
           </td>`;
@@ -2354,10 +2360,10 @@ function closeAdminEditModal() {
 async function loadProxyStaffSelect() {
   const sel = document.getElementById('proxy-staff-select');
   if (!sel) return;
-  const { data } = await sb.from('staff').select('id, name, code').order('code');
+  const { data } = await sb.from('staff').select('id, name').eq('is_external_viewer', false).order('name');
   sel.innerHTML = '<option value="">-- 選択してください --</option>';
   if (data) data.forEach(s => {
-    sel.innerHTML += `<option value="${s.id}">${s.name}（${s.code}）</option>`;
+    sel.innerHTML += `<option value="${s.id}">${escapeHtml(s.name)}</option>`;
   });
   sel.onchange = loadProxyStaff;
 }
@@ -2488,27 +2494,31 @@ async function registerStaff() {
   const code = document.getElementById('new-staff-code').value.trim();
   const msgEl = document.getElementById('staff-register-msg');
   if (!name || !code) { msgEl.innerHTML = '<div class="msg-error">名前とコードを両方入力してください。</div>'; return; }
+  if (!/^[0-9]{1,10}$/.test(code)) { msgEl.textContent = 'スタッフコードは数字で入力してください。'; return; }
   if (/^\d+$/.test(name)) { msgEl.innerHTML = '<div class="msg-error">名前に数字だけが入力されています。名前とコードが逆になっていませんか？</div>'; return; }
   showDangerModal(
     `以下の内容で登録します。\n\n名前：${name}\nコード：${code}\n\n間違いありませんか？`,
     async () => {
-      const { error } = await sb.from('staff').insert({ name, code });
+      const { data, error } = await sb.functions.invoke('nikusho-accounts', { body: { action: 'register', name, code } });
       if (error) {
-        msgEl.innerHTML = '<div class="msg-error">登録に失敗しました。コードが重複している可能性があります。</div>';
+        msgEl.textContent = '登録に失敗しました。コードが重複していないか確認してください。';
+        loadStaffList();
       } else {
-        msgEl.innerHTML = '<div class="msg-success">✅ 登録しました。</div>';
+        msgEl.textContent = `登録しました。本人にコード ${data.staffCode} を渡してください。初回に本人がパスワードを設定できます。`;
         document.getElementById('new-staff-name').value = '';
         document.getElementById('new-staff-code').value = '';
         loadStaffList();
       }
     },
-    '登録する'
+    'この内容で登録する'
   );
 }
 
 async function loadStaffList() {
   const listEl = document.getElementById('staff-list-admin');
-  const { data } = await sb.from('staff').select('*').order('code');
+  const { data } = currentStaff?.is_admin
+    ? await sb.rpc('nikusho_admin_staff')
+    : await sb.from('staff').select('id, name, is_admin, is_external_viewer').order('name');
   if (!data || data.length === 0) { listEl.innerHTML = '<div class="empty-msg">スタッフが登録されていません。</div>'; return; }
   listEl.innerHTML = '';
   data.forEach(s => {
@@ -2517,12 +2527,29 @@ async function loadStaffList() {
 
     const info = document.createElement('div');
     info.className = 'info';
-    info.innerHTML = `${s.name}<span class="code-badge">${s.code || '未設定'}</span>`;
-    if (s.is_admin) {
-      info.innerHTML += ` <span style="font-size:11px;color:#7c3aed">👑 管理者</span>`;
+    info.textContent = s.name;
+    if (s.code) {
+      const badge = document.createElement('span');
+      badge.className = 'code-badge';
+      badge.textContent = s.code;
+      info.appendChild(badge);
     }
-    if (s.pin) {
-      info.innerHTML += ` <span style="font-size:11px;color:#10b981">🔐 パスワード設定済み</span>`;
+    if (s.is_admin || s.is_external_viewer) {
+      const role = document.createElement('span');
+      role.className = 'staff-role-label';
+      role.textContent = s.is_admin ? '👑 管理者' : '他店社員';
+      info.appendChild(role);
+    }
+    if (s.password_configured) {
+      const status = document.createElement('span');
+      status.className = 'staff-password-status';
+      status.textContent = '🔐 パスワード設定済み';
+      info.appendChild(status);
+    }
+    item.appendChild(info);
+    if (!currentStaff?.is_admin) {
+      listEl.appendChild(item);
+      return;
     }
 
     const btnGroup = document.createElement('div');
@@ -2531,7 +2558,7 @@ async function loadStaffList() {
     const adminBtn = document.createElement('button');
     adminBtn.className = 'admin-toggle-btn' + (s.is_admin ? ' is-admin' : '');
     adminBtn.textContent = s.is_admin ? '👑 管理者を外す' : '管理者にする';
-    const isSelf = currentStaff && currentStaff.id === s.id;
+    const isSelf = String(currentStaff.id) === String(s.id);
     if (isSelf) {
       adminBtn.disabled = true;
       adminBtn.title = '自分自身の管理者権限は変更できません';
@@ -2544,44 +2571,66 @@ async function loadStaffList() {
         ? `${s.name} さんを管理者にしますか？`
         : `${s.name} さんの管理者権限を外しますか？`;
       showDangerModal(msg, async () => {
-        await sb.from('staff').update({ is_admin: newVal }).eq('id', s.id);
+        await sb.from('staff').update({ is_admin: newVal, is_external_viewer: false }).eq('id', s.id);
         loadStaffList();
       }, newVal ? '管理者にする' : '権限を外す');
+    });
+
+    const viewerBtn = document.createElement('button');
+    viewerBtn.className = 'admin-toggle-btn staff-viewer-btn';
+    viewerBtn.textContent = s.is_external_viewer ? '他店社員の権限を外す' : '他店社員にする';
+    viewerBtn.disabled = isSelf || s.is_admin;
+    viewerBtn.addEventListener('click', () => {
+      showDangerModal(`${s.name} さんの他店社員権限を変更しますか？`, async () => {
+        const { error } = await sb.from('staff').update({ is_external_viewer: !s.is_external_viewer }).eq('id', s.id);
+        if (error) alert('権限を変更できませんでした。');
+        loadStaffList();
+      }, s.is_external_viewer ? '権限を外す' : '他店社員にする');
     });
 
     const resetBtn = document.createElement('button');
     resetBtn.className = 'reset-pin-btn';
     resetBtn.textContent = 'パスワードリセット';
+    resetBtn.disabled = isSelf;
     resetBtn.addEventListener('click', e => {
       e.stopPropagation();
       showDangerModal(
-        `${s.name} さんのパスワードをリセットしますか？\n次回ログイン時に新しいパスワードを設定します。`,
+        `${s.name} さんのパスワードをリセットしますか？\n本人が新しいパスワードを設定できるようになります。`,
         async () => {
-          await sb.from('staff').update({ pin: null }).eq('id', s.id);
+          const { data, error } = await sb.functions.invoke('nikusho-accounts', {
+            body: { action: 'reset', staffId: String(s.id) }
+          });
+          document.getElementById('staff-register-msg').textContent = error
+            ? 'パスワードをリセットできませんでした。'
+            : `${s.name} さんはコード ${data.staffCode} で、新しいパスワードを設定できます。`;
           loadStaffList();
         },
-        'はい、リセットする'
+        'リセットする'
       );
     });
 
     const delBtn = document.createElement('button');
     delBtn.className = 'del-btn';
     delBtn.textContent = '削除';
+    delBtn.disabled = isSelf;
     delBtn.addEventListener('click', e => {
       e.stopPropagation();
       showDangerModal(
         `${s.name} さんを削除しますか？`,
         async () => {
-          await sb.from('staff').delete().eq('id', s.id);
+          const { error } = await sb.functions.invoke('nikusho-accounts', {
+            body: { action: 'delete', staffId: String(s.id) }
+          });
+          if (error) alert('削除を完了できませんでした。管理者に確認してください。');
           loadStaffList();
         }
       );
     });
 
     btnGroup.appendChild(adminBtn);
+    btnGroup.appendChild(viewerBtn);
     btnGroup.appendChild(resetBtn);
     btnGroup.appendChild(delBtn);
-    item.appendChild(info);
     item.appendChild(btnGroup);
     listEl.appendChild(item);
   });
@@ -2609,7 +2658,7 @@ async function resolveDashboardPeriod() {
 // 対象期間中に「未提出」（提出なし かつ スキップもしていない）スタッフ一覧を返す
 async function getUnsubmittedStaff() {
   const { psStr, peStr } = await resolveDashboardPeriod();
-  const { data: staffData } = await sb.from('staff').select('id, name, code').order('code');
+  const { data: staffData } = await sb.from('staff').select('id, name').eq('is_external_viewer', false).order('name');
   const allStaff = staffData || [];
 
   const { data: reqData } = await sb.from('shift_requests').select('staff_id').gte('date', psStr).lte('date', peStr);
@@ -2670,7 +2719,7 @@ async function showUnsubmittedStaffModal() {
     listEl.innerHTML = '<div class="empty-msg">未提出のスタッフはいません🎉</div>';
     return;
   }
-  listEl.innerHTML = unsubmitted.map(s => `<div class="submitted-item"><div class="date-label">${s.name}</div></div>`).join('');
+  listEl.innerHTML = unsubmitted.map(s => `<div class="submitted-item"><div class="date-label">${escapeHtml(s.name)}</div></div>`).join('');
 }
 
 function closeUnsubmittedModal() {
@@ -2806,7 +2855,7 @@ async function loadSpecialHolidayList() {
     item.className = 'submitted-item';
     item.innerHTML = `<div>
       <div class="date-label">${d.getMonth()+1}/${d.getDate()}（${DOW[d.getDay()]}） <span style="font-size:11px;font-weight:bold;padding:2px 7px;border-radius:10px;background:${isClosedType?'#e5e7eb':'#fef9c3'};color:${isClosedType?'#4b5563':'#b45309'}">${isClosedType?'休業日':'休日扱い'}</span></div>
-      ${r.note ? `<div class="time-label">${r.note}</div>` : ''}
+      ${r.note ? `<div class="time-label">${escapeHtml(r.note)}</div>` : ''}
     </div>`;
     const delBtn = document.createElement('button');
     delBtn.className = 'del-btn';
@@ -2824,66 +2873,19 @@ async function loadSpecialHolidayList() {
   });
 }
 
-// ====== スタッフ：PIN変更 ======
-async function changePinStaff() {
-  const currentPin = document.getElementById('change-pin-current').value.trim();
-  const newPin1 = document.getElementById('change-pin-new1').value.trim();
-  const newPin2 = document.getElementById('change-pin-new2').value.trim();
-  const msgEl = document.getElementById('change-pin-msg');
+// ====== スタッフ：パスワード変更 ======
+document.getElementById('change-pin-btn').addEventListener('click', () => changeAccountPassword(
+  document.getElementById('change-pin-current').value,
+  document.getElementById('change-pin-new1').value,
+  document.getElementById('change-pin-new2').value,
+  document.getElementById('change-pin-msg')
+));
 
-  if (currentPin !== String(currentStaff.pin)) {
-    msgEl.innerHTML = '<div class="msg-error">現在のパスワードが違います</div>'; return;
-  }
-  if (!newPin1 || newPin1.length !== 4 || !/^\d{4}$/.test(newPin1)) {
-    msgEl.innerHTML = '<div class="msg-error">新しいパスワードは4桁の数字で入力してください</div>'; return;
-  }
-  if (newPin1 !== newPin2) {
-    msgEl.innerHTML = '<div class="msg-error">新しいパスワードが一致しません</div>'; return;
-  }
-
-  const { error } = await sb.from('staff').update({ pin: newPin1 }).eq('id', currentStaff.id);
-  if (error) { msgEl.innerHTML = '<div class="msg-error">変更に失敗しました</div>'; return; }
-
-  currentStaff.pin = newPin1;
-  localStorage.setItem('shift_saved_pin', newPin1);
-  document.getElementById('change-pin-current').value = '';
-  document.getElementById('change-pin-new1').value = '';
-  document.getElementById('change-pin-new2').value = '';
-  msgEl.innerHTML = '<div class="msg-success">✅ パスワードを変更しました</div>';
-}
-
-function renderDeviceSaveStatus() {
-  const saved = localStorage.getItem('shift_saved_code');
-  const el = document.getElementById('device-save-status');
-  if (saved) {
-    el.textContent = '✅ このデバイスでは次回から自動でログインします。';
-  } else {
-    el.textContent = 'このデバイスには記憶されていません。';
-  }
-}
-
-document.getElementById('change-pin-btn').addEventListener('click', changePinStaff);
-document.getElementById('forget-device-btn').addEventListener('click', () => {
+(async function restoreSession() {
   localStorage.removeItem('shift_saved_code');
   localStorage.removeItem('shift_saved_pin');
-  renderDeviceSaveStatus();
-  document.getElementById('forget-device-btn').textContent = '削除しました';
-  setTimeout(() => { document.getElementById('forget-device-btn').textContent = 'このデバイスの記憶を削除する'; }, 2000);
-});
-
-// ====== 起動時の自動ログイン ======
-(async function autoLogin() {
-  const savedCode = localStorage.getItem('shift_saved_code');
-  const savedPin = localStorage.getItem('shift_saved_pin');
-  if (!savedCode || !savedPin) return;
-  const { data } = await sb.from('staff').select('*').eq('code', savedCode).maybeSingle();
-  if (data && String(data.pin) === savedPin) {
-    tempStaff = data;
-    await completeLogin();
-  } else {
-    localStorage.removeItem('shift_saved_code');
-    localStorage.removeItem('shift_saved_pin');
-  }
+  const { data } = await sb.auth.getSession();
+  if (data.session) await loadAccount();
 })();
 
 // ====== QRコード ======
