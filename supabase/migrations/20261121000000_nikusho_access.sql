@@ -5,11 +5,14 @@ alter table public.staff
   add column is_external_viewer boolean not null default false,
   add column password_setup_required boolean not null default true,
   add column password_reset_at timestamptz,
+  add column password_setup_until timestamptz,
   add column account_locked boolean not null default false,
   add constraint nikusho_staff_one_role check (not (coalesce(is_admin, false) and is_external_viewer));
 
 -- The active Auth session must belong to the linked staff member and have
 -- started after the most recent reset. Never trust browser-supplied roles.
+create unique index nikusho_staff_login_code on public.staff ((code::text)) where code is not null;
+
 create schema if not exists nikusho_private;
 revoke all on schema nikusho_private from public, anon, authenticated;
 grant usage on schema nikusho_private to authenticated;
@@ -70,21 +73,89 @@ grant execute on function nikusho_private.owns_staff(text) to authenticated;
 -- Only the account-management function can finish releasing an account.
 -- Use the database clock, which also timestamps Auth sessions.
 create function public.nikusho_finish_password_change(
-  target_staff_id text, target_auth_user_id uuid, setup_required boolean
+  target_staff_id text, target_auth_user_id uuid
 )
 returns boolean
 language plpgsql security definer set search_path = ''
 as $$
 begin
   update public.staff set auth_user_id = target_auth_user_id,
-    password_setup_required = setup_required, password_reset_at = clock_timestamp(),
+    password_setup_required = false, password_setup_until = null,
+    password_reset_at = clock_timestamp(),
     account_locked = false
   where id::text = target_staff_id and account_locked;
   return found;
 end
 $$;
-revoke all on function public.nikusho_finish_password_change(text, uuid, boolean) from public, anon, authenticated;
-grant execute on function public.nikusho_finish_password_change(text, uuid, boolean) to service_role;
+revoke all on function public.nikusho_finish_password_change(text, uuid) from public, anon, authenticated;
+grant execute on function public.nikusho_finish_password_change(text, uuid) to service_role;
+
+create function public.nikusho_open_password_setup(target_staff_id text)
+returns boolean
+language plpgsql security definer set search_path = ''
+as $$
+begin
+  update public.staff set password_setup_required = true,
+    password_setup_until = now() + interval '15 minutes', password_reset_at = now()
+  where id::text = target_staff_id and not account_locked;
+  return found;
+end
+$$;
+revoke all on function public.nikusho_open_password_setup(text) from public, anon, authenticated;
+grant execute on function public.nikusho_open_password_setup(text) to service_role;
+
+-- Serialize attempts globally. This also caps attempts made against unknown codes.
+create table nikusho_private.setup_rate_limit (
+  singleton boolean primary key default true check (singleton),
+  bucket bigint not null,
+  attempts integer not null
+);
+revoke all on nikusho_private.setup_rate_limit from public, anon, authenticated;
+
+create function public.nikusho_claim_password_setup(staff_code text)
+returns jsonb
+language plpgsql security definer set search_path = ''
+as $$
+declare
+  current_bucket bigint := floor(extract(epoch from clock_timestamp()) / 60);
+  allowed_attempts integer;
+  account record;
+begin
+  insert into nikusho_private.setup_rate_limit as limit_row (bucket, attempts)
+  values (current_bucket, 1)
+  on conflict (singleton) do update
+  set bucket = excluded.bucket,
+    attempts = case when limit_row.bucket = excluded.bucket then least(limit_row.attempts + 1, 13) else 1 end
+  returning attempts into allowed_attempts;
+
+  if allowed_attempts > 12 then
+    return jsonb_build_object('rate_limited', true);
+  end if;
+  update public.staff set account_locked = true
+  where code::text = staff_code and password_setup_required
+    and password_setup_until > clock_timestamp() and not account_locked
+  returning id::text, code::text, auth_user_id into account;
+  if not found then return null; end if;
+
+  return jsonb_build_object('id', account.id, 'code', account.code, 'auth_user_id', account.auth_user_id);
+end
+$$;
+revoke all on function public.nikusho_claim_password_setup(text) from public, anon, authenticated;
+grant execute on function public.nikusho_claim_password_setup(text) to service_role;
+
+-- Staff codes double as enrollment credentials while enrollment is open.
+-- The general staff read policy and viewer lists must not expose these codes.
+create function public.nikusho_admin_staff()
+returns table (id text, name text, code text, is_admin boolean, is_external_viewer boolean)
+language sql stable security definer set search_path = ''
+as $$
+  select s.id::text, s.name::text, s.code::text, coalesce(s.is_admin, false), s.is_external_viewer
+  from public.staff s
+  where (select nikusho_private.ready_role()) = 'admin'
+  order by s.code
+$$;
+revoke all on function public.nikusho_admin_staff() from public, anon, authenticated;
+grant execute on function public.nikusho_admin_staff() to authenticated;
 
 -- Replace legacy policies on the app's tables in one transaction, otherwise
 -- a permissive legacy policy could still authorize a request.
@@ -124,7 +195,7 @@ begin
 end
 $$;
 
-grant select (id, name, code, is_admin, is_external_viewer) on public.staff to authenticated;
+grant select (id, name, is_admin, is_external_viewer) on public.staff to authenticated;
 grant update (is_admin, is_external_viewer) on public.staff to authenticated;
 grant select, insert, update, delete on public.shift_requests, public.shift_skip,
   public.deadlines, public.special_holidays, public.announcements to authenticated;

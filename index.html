@@ -398,17 +398,19 @@
         <input type="password" class="pin-input" id="login-password" autocomplete="current-password" required style="letter-spacing:normal;font-size:16px">
         <br><button class="code-btn" type="submit">ログイン</button>
         <div id="login-msg" role="status"></div>
+        <button type="button" class="back-link" id="open-password-setup">初回・再設定はこちら</button>
       </form>
       <form class="code-box" id="initial-password" hidden>
-        <p>仮パスワードを入力して、新しいパスワードを設定してください。</p>
-        <label for="temporary-password">仮パスワード</label>
-        <input id="temporary-password" type="password" autocomplete="current-password" required>
+        <p>管理者から案内を受けたら、スタッフコードとご自身で決めたパスワードを入力してください。</p>
+        <label for="setup-staff-code">スタッフコード</label>
+        <input id="setup-staff-code" type="text" inputmode="numeric" autocomplete="username" pattern="[0-9]{1,10}" required>
         <label for="new-password">新しいパスワード（10文字以上）</label>
         <input id="new-password" type="password" autocomplete="new-password" minlength="10" maxlength="72" required>
         <label for="new-password-confirm">新しいパスワード（確認）</label>
         <input id="new-password-confirm" type="password" autocomplete="new-password" minlength="10" maxlength="72" required>
         <button class="code-btn" type="submit">パスワードを設定する</button>
         <div id="setup-message" role="status"></div>
+        <button type="button" class="back-link" id="close-password-setup">ログインに戻る</button>
       </form>
     </div>
 
@@ -577,6 +579,12 @@
             <label style="font-size:13px;color:#64748b;display:block;margin-bottom:4px">② スタッフコード（ログイン時に使う番号）</label>
             <input type="text" id="new-staff-code" placeholder="例：001" style="max-width:120px" />
           </div>
+          <label for="new-staff-role">権限</label>
+          <select id="new-staff-role">
+            <option value="staff">一般スタッフ</option>
+            <option value="viewer">他店社員（閲覧・印刷のみ）</option>
+            <option value="admin">管理者</option>
+          </select>
           <button class="primary-btn" onclick="registerStaff()" style="margin-top:4px">登録する</button>
         </div>
         <div id="staff-register-msg"></div>
@@ -844,8 +852,7 @@ async function loadAccount() {
   if (error || !account) return false;
   document.getElementById('logout-btn').style.display = 'inline-block';
   if (account.password_setup_required) {
-    loginForm.hidden = true;
-    setupForm.hidden = false;
+    showPasswordSetup(String(account.code));
     return true;
   }
   currentStaff = account;
@@ -883,7 +890,7 @@ loginForm.addEventListener('submit', async event => {
   button.disabled = true;
   try {
     const { error } = await sb.auth.signInWithPassword({ email: await staffLoginAddress(code), password: password.value });
-    if (error || !(await loadAccount())) message.textContent = 'コードとパスワードを確認してください。再発行直後は仮パスワードを使ってください。';
+    if (error || !(await loadAccount())) message.textContent = 'コードとパスワードを確認してください。初回や再設定は「初回・再設定はこちら」を押してください。';
     else password.value = '';
   } catch {
     message.textContent = '通信に失敗しました。再度お試しください。';
@@ -907,17 +914,51 @@ async function changeAccountPassword(currentPassword, password, confirmation, me
   await logout();
 }
 
+function showPasswordSetup(code) {
+  document.getElementById('setup-staff-code').value = code;
+  document.getElementById('setup-message').textContent = '';
+  loginForm.hidden = true;
+  setupForm.hidden = false;
+  document.getElementById(code ? 'new-password' : 'setup-staff-code').focus();
+}
+
+document.getElementById('open-password-setup').addEventListener('click', () => {
+  showPasswordSetup(document.getElementById('staff-code-input').value.trim());
+});
+document.getElementById('close-password-setup').addEventListener('click', () => {
+  setupForm.reset();
+  setupForm.hidden = true;
+  loginForm.hidden = false;
+});
+
 setupForm.addEventListener('submit', async event => {
   event.preventDefault();
-  const button = setupForm.querySelector('button');
+  const button = setupForm.querySelector('[type="submit"]');
+  const message = document.getElementById('setup-message');
+  const code = document.getElementById('setup-staff-code').value.trim();
+  const password = document.getElementById('new-password').value;
+  const confirmation = document.getElementById('new-password-confirm').value;
+  if (password !== confirmation || password.length < 10 || new TextEncoder().encode(password).length > 72) {
+    message.textContent = '10文字以上のパスワードを入力し、確認欄に同じ内容を入力してください。';
+    return;
+  }
   button.disabled = true;
   try {
-    await changeAccountPassword(
-      document.getElementById('temporary-password').value,
-      document.getElementById('new-password').value,
-      document.getElementById('new-password-confirm').value,
-      document.getElementById('setup-message')
-    );
+    const { error } = await sb.functions.invoke('nikusho-accounts', {
+      body: { action: 'activate', code, password }
+    });
+    if (error) {
+      message.textContent = '設定できませんでした。コードと受付時間を管理者に確認してください。';
+      return;
+    }
+    await sb.auth.signOut({ scope: 'local' });
+    setupForm.reset();
+    setupForm.hidden = true;
+    loginForm.hidden = false;
+    document.getElementById('staff-code-input').value = code;
+    document.getElementById('login-password').value = '';
+    document.getElementById('login-msg').textContent = '設定しました。今決めたパスワードでログインしてください。';
+    document.getElementById('login-password').focus();
   } finally {
     button.disabled = false;
   }
@@ -1901,7 +1942,7 @@ async function loadAdminShifts() {
 
   const [requests, staff] = await Promise.all([
     sb.from('shift_requests').select('*').gte('date', psStr).lte('date', peStr).order('date').order('start_time'),
-    sb.from('staff').select('id, name').eq('is_external_viewer', false).order('code'),
+    sb.from('staff').select('id, name').eq('is_external_viewer', false).order('name'),
   ]);
   if (request !== matrixLoadRequest) return;
   if (requests.error || staff.error) {
@@ -2315,10 +2356,10 @@ function closeAdminEditModal() {
 async function loadProxyStaffSelect() {
   const sel = document.getElementById('proxy-staff-select');
   if (!sel) return;
-  const { data } = await sb.from('staff').select('id, name, code').eq('is_external_viewer', false).order('code');
+  const { data } = await sb.from('staff').select('id, name').eq('is_external_viewer', false).order('name');
   sel.innerHTML = '<option value="">-- 選択してください --</option>';
   if (data) data.forEach(s => {
-    sel.innerHTML += `<option value="${s.id}">${escapeHtml(s.name)}（${escapeHtml(s.code)}）</option>`;
+    sel.innerHTML += `<option value="${s.id}">${escapeHtml(s.name)}</option>`;
   });
   sel.onchange = loadProxyStaff;
 }
@@ -2448,19 +2489,22 @@ async function registerStaff() {
   const name = document.getElementById('new-staff-name').value.trim();
   const code = document.getElementById('new-staff-code').value.trim();
   const msgEl = document.getElementById('staff-register-msg');
+  const roleSelect = document.getElementById('new-staff-role');
+  const role = roleSelect.value;
   if (!name || !code) { msgEl.innerHTML = '<div class="msg-error">名前とコードを両方入力してください。</div>'; return; }
   if (/^\d+$/.test(name)) { msgEl.innerHTML = '<div class="msg-error">名前に数字だけが入力されています。名前とコードが逆になっていませんか？</div>'; return; }
   showDangerModal(
-    `以下の内容で登録します。\n\n名前：${name}\nコード：${code}\n\n間違いありませんか？`,
+    `以下の内容で登録します。\n\n名前：${name}\nコード：${code}\n権限：${roleSelect.selectedOptions[0].textContent}\n\n間違いありませんか？`,
     async () => {
-      const { data, error } = await sb.functions.invoke('nikusho-accounts', { body: { action: 'register', name, code } });
+      const { data, error } = await sb.functions.invoke('nikusho-accounts', { body: { action: 'register', name, code, role } });
       if (error) {
         msgEl.textContent = '登録に失敗しました。コードが重複していないか確認してください。';
         loadStaffList();
       } else {
-        msgEl.textContent = `登録しました。コード ${data.staffCode} と仮パスワードを本人に渡してください。 ${data.temporaryPassword}`;
+        msgEl.textContent = `登録しました。本人にコード ${data.staffCode} を渡し、15分以内にパスワードを設定してもらってください。`;
         document.getElementById('new-staff-name').value = '';
         document.getElementById('new-staff-code').value = '';
+        roleSelect.value = 'staff';
         loadStaffList();
       }
     },
@@ -2470,7 +2514,9 @@ async function registerStaff() {
 
 async function loadStaffList() {
   const listEl = document.getElementById('staff-list-admin');
-  const { data } = await sb.from('staff').select('id, name, code, is_admin, is_external_viewer').order('code');
+  const { data } = currentStaff?.is_admin
+    ? await sb.rpc('nikusho_admin_staff')
+    : await sb.from('staff').select('id, name, is_admin, is_external_viewer').order('name');
   if (!data || data.length === 0) { listEl.innerHTML = '<div class="empty-msg">スタッフが登録されていません。</div>'; return; }
   listEl.innerHTML = '';
   data.forEach(s => {
@@ -2479,7 +2525,7 @@ async function loadStaffList() {
 
     const info = document.createElement('div');
     info.className = 'info';
-    info.textContent = `${s.name}（${s.code || '未設定'}）${s.is_admin ? ' 管理者' : s.is_external_viewer ? ' 他店社員' : ''}`;
+    info.textContent = `${s.name}${s.code ? `（${s.code}）` : ''}${s.is_admin ? ' 管理者' : s.is_external_viewer ? ' 他店社員' : ''}`;
     item.appendChild(info);
     if (!currentStaff?.is_admin) {
       listEl.appendChild(item);
@@ -2524,22 +2570,22 @@ async function loadStaffList() {
 
     const resetBtn = document.createElement('button');
     resetBtn.className = 'reset-pin-btn';
-    resetBtn.textContent = '仮パスワードを発行';
+    resetBtn.textContent = 'パスワード設定を受け付ける';
     resetBtn.disabled = isSelf;
     resetBtn.addEventListener('click', e => {
       e.stopPropagation();
       showDangerModal(
-        `${s.name} さんのパスワードをリセットしますか？\n次回ログイン時に新しいパスワードを設定します。`,
+        `${s.name} さんのパスワード設定を15分間受け付けますか？\n現在のログインは無効になります。`,
         async () => {
           const { data, error } = await sb.functions.invoke('nikusho-accounts', {
             body: { action: 'reset', staffId: String(s.id) }
           });
           document.getElementById('staff-register-msg').textContent = error
-            ? '発行できませんでした。管理者に確認してください。'
-            : `${s.name} さんのコード ${data.staffCode} と仮パスワード。本人にだけ渡してください。 ${data.temporaryPassword}`;
+            ? 'パスワード設定の受付を開始できませんでした。'
+            : `${s.name} さんはコード ${data.staffCode} で、今から15分以内にパスワードを設定できます。`;
           loadStaffList();
         },
-        'はい、リセットする'
+        '受付を開始する'
       );
     });
 
@@ -2592,7 +2638,7 @@ async function resolveDashboardPeriod() {
 // 対象期間中に「未提出」（提出なし かつ スキップもしていない）スタッフ一覧を返す
 async function getUnsubmittedStaff() {
   const { psStr, peStr } = await resolveDashboardPeriod();
-  const { data: staffData } = await sb.from('staff').select('id, name, code').eq('is_external_viewer', false).order('code');
+  const { data: staffData } = await sb.from('staff').select('id, name').eq('is_external_viewer', false).order('name');
   const allStaff = staffData || [];
 
   const { data: reqData } = await sb.from('shift_requests').select('staff_id').gte('date', psStr).lte('date', peStr);
