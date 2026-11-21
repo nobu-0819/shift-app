@@ -145,10 +145,11 @@ grant execute on function public.nikusho_claim_password_setup(text) to service_r
 -- Staff codes double as enrollment credentials before a password is set.
 -- The general staff read policy and viewer lists must not expose these codes.
 create function public.nikusho_admin_staff()
-returns table (id text, name text, code text, is_admin boolean, is_external_viewer boolean)
+returns table (id text, name text, code text, is_admin boolean, is_external_viewer boolean, password_configured boolean)
 language sql stable security definer set search_path = ''
 as $$
-  select s.id::text, s.name::text, s.code::text, coalesce(s.is_admin, false), s.is_external_viewer
+  select s.id::text, s.name::text, s.code::text, coalesce(s.is_admin, false), s.is_external_viewer,
+    s.auth_user_id is not null and not s.password_setup_required and not s.account_locked
   from public.staff s
   where (select nikusho_private.ready_role()) = 'admin'
   order by s.code

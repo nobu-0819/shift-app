@@ -141,7 +141,17 @@
     .staff-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; margin-bottom: 8px; gap: 8px; }
     .staff-list-item .info { font-size: 14px; flex: 1; }
     .staff-list-item .code-badge { font-size: 13px; color: #64748b; background: #f1f5f9; padding: 3px 10px; border-radius: 6px; font-weight: bold; margin-left: 8px; }
-    .staff-list-item .btn-group { display: flex; gap: 6px; }
+    .staff-list-item .btn-group { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .staff-role-label, .staff-password-status { font-size: 11px; margin-left: 6px; }
+    .staff-role-label { color: #7c3aed; }
+    .staff-password-status { color: #059669; }
+    .staff-viewer-btn { color: #0369a1; border-color: #7dd3fc; }
+    .staff-list-item button:disabled { opacity: .45; cursor: default; }
+    @media (max-width: 600px) {
+      .staff-list-item { flex-wrap: wrap; }
+      .staff-list-item .info { flex-basis: 100%; }
+      .staff-list-item .btn-group { justify-content: flex-start; }
+    }
     .reset-pin-btn { background: none; border: 1.5px solid #fbbf24; color: #d97706; border-radius: 8px; padding: 7px 10px; font-size: 12px; cursor: pointer; white-space: nowrap; touch-action: manipulation; }
     .admin-toggle-btn { background: none; border: 1.5px solid #a78bfa; color: #7c3aed; border-radius: 8px; padding: 7px 10px; font-size: 12px; cursor: pointer; white-space: nowrap; touch-action: manipulation; }
     .admin-toggle-btn.is-admin { border-color: #6ee7b7; color: #059669; }
@@ -569,7 +579,7 @@
 
     <div id="admin-tab-staff" style="display:none">
       <div class="card">
-        <div class="section-title">👥 スタッフ一覧</div>
+        <div class="section-title">👥 スタッフ登録</div>
         <div class="admin-write" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
           <div>
             <label style="font-size:13px;color:#64748b;display:block;margin-bottom:4px">① 名前（フルネーム）</label>
@@ -2484,6 +2494,7 @@ async function registerStaff() {
   const code = document.getElementById('new-staff-code').value.trim();
   const msgEl = document.getElementById('staff-register-msg');
   if (!name || !code) { msgEl.innerHTML = '<div class="msg-error">名前とコードを両方入力してください。</div>'; return; }
+  if (!/^[0-9]{1,10}$/.test(code)) { msgEl.textContent = 'スタッフコードは数字で入力してください。'; return; }
   if (/^\d+$/.test(name)) { msgEl.innerHTML = '<div class="msg-error">名前に数字だけが入力されています。名前とコードが逆になっていませんか？</div>'; return; }
   showDangerModal(
     `以下の内容で登録します。\n\n名前：${name}\nコード：${code}\n\n間違いありませんか？`,
@@ -2499,7 +2510,7 @@ async function registerStaff() {
         loadStaffList();
       }
     },
-    '登録する'
+    'この内容で登録する'
   );
 }
 
@@ -2516,7 +2527,25 @@ async function loadStaffList() {
 
     const info = document.createElement('div');
     info.className = 'info';
-    info.textContent = `${s.name}${s.code ? `（${s.code}）` : ''}${s.is_admin ? ' 管理者' : s.is_external_viewer ? ' 他店社員' : ''}`;
+    info.textContent = s.name;
+    if (s.code) {
+      const badge = document.createElement('span');
+      badge.className = 'code-badge';
+      badge.textContent = s.code;
+      info.appendChild(badge);
+    }
+    if (s.is_admin || s.is_external_viewer) {
+      const role = document.createElement('span');
+      role.className = 'staff-role-label';
+      role.textContent = s.is_admin ? '👑 管理者' : '他店社員';
+      info.appendChild(role);
+    }
+    if (s.password_configured) {
+      const status = document.createElement('span');
+      status.className = 'staff-password-status';
+      status.textContent = '🔐 パスワード設定済み';
+      info.appendChild(status);
+    }
     item.appendChild(info);
     if (!currentStaff?.is_admin) {
       listEl.appendChild(item);
@@ -2529,7 +2558,7 @@ async function loadStaffList() {
     const adminBtn = document.createElement('button');
     adminBtn.className = 'admin-toggle-btn' + (s.is_admin ? ' is-admin' : '');
     adminBtn.textContent = s.is_admin ? '👑 管理者を外す' : '管理者にする';
-    const isSelf = currentStaff && currentStaff.id === s.id;
+    const isSelf = String(currentStaff.id) === String(s.id);
     if (isSelf) {
       adminBtn.disabled = true;
       adminBtn.title = '自分自身の管理者権限は変更できません';
@@ -2548,7 +2577,7 @@ async function loadStaffList() {
     });
 
     const viewerBtn = document.createElement('button');
-    viewerBtn.className = 'outline-btn';
+    viewerBtn.className = 'admin-toggle-btn staff-viewer-btn';
     viewerBtn.textContent = s.is_external_viewer ? '他店社員の権限を外す' : '他店社員にする';
     viewerBtn.disabled = isSelf || s.is_admin;
     viewerBtn.addEventListener('click', () => {
@@ -2556,12 +2585,12 @@ async function loadStaffList() {
         const { error } = await sb.from('staff').update({ is_external_viewer: !s.is_external_viewer }).eq('id', s.id);
         if (error) alert('権限を変更できませんでした。');
         loadStaffList();
-      });
+      }, s.is_external_viewer ? '権限を外す' : '他店社員にする');
     });
 
     const resetBtn = document.createElement('button');
     resetBtn.className = 'reset-pin-btn';
-    resetBtn.textContent = 'パスワードをリセット';
+    resetBtn.textContent = 'パスワードリセット';
     resetBtn.disabled = isSelf;
     resetBtn.addEventListener('click', e => {
       e.stopPropagation();
