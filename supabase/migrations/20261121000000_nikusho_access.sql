@@ -5,7 +5,6 @@ alter table public.staff
   add column is_external_viewer boolean not null default false,
   add column password_setup_required boolean not null default true,
   add column password_reset_at timestamptz,
-  add column password_setup_until timestamptz,
   add column account_locked boolean not null default false,
   add constraint nikusho_staff_one_role check (not (coalesce(is_admin, false) and is_external_viewer));
 
@@ -80,7 +79,7 @@ language plpgsql security definer set search_path = ''
 as $$
 begin
   update public.staff set auth_user_id = target_auth_user_id,
-    password_setup_required = false, password_setup_until = null,
+    password_setup_required = false,
     password_reset_at = clock_timestamp(),
     account_locked = false
   where id::text = target_staff_id and account_locked;
@@ -90,19 +89,19 @@ $$;
 revoke all on function public.nikusho_finish_password_change(text, uuid) from public, anon, authenticated;
 grant execute on function public.nikusho_finish_password_change(text, uuid) to service_role;
 
-create function public.nikusho_open_password_setup(target_staff_id text)
+create function public.nikusho_reset_password_setup(target_staff_id text)
 returns boolean
 language plpgsql security definer set search_path = ''
 as $$
 begin
   update public.staff set password_setup_required = true,
-    password_setup_until = now() + interval '15 minutes', password_reset_at = now()
+    password_reset_at = clock_timestamp()
   where id::text = target_staff_id and not account_locked;
   return found;
 end
 $$;
-revoke all on function public.nikusho_open_password_setup(text) from public, anon, authenticated;
-grant execute on function public.nikusho_open_password_setup(text) to service_role;
+revoke all on function public.nikusho_reset_password_setup(text) from public, anon, authenticated;
+grant execute on function public.nikusho_reset_password_setup(text) to service_role;
 
 -- Serialize attempts globally. This also caps attempts made against unknown codes.
 create table nikusho_private.setup_rate_limit (
@@ -133,7 +132,7 @@ begin
   end if;
   update public.staff set account_locked = true
   where code::text = staff_code and password_setup_required
-    and password_setup_until > clock_timestamp() and not account_locked
+    and not account_locked
   returning id::text, code::text, auth_user_id into account;
   if not found then return null; end if;
 
@@ -143,7 +142,7 @@ $$;
 revoke all on function public.nikusho_claim_password_setup(text) from public, anon, authenticated;
 grant execute on function public.nikusho_claim_password_setup(text) to service_role;
 
--- Staff codes double as enrollment credentials while enrollment is open.
+-- Staff codes double as enrollment credentials before a password is set.
 -- The general staff read policy and viewer lists must not expose these codes.
 create function public.nikusho_admin_staff()
 returns table (id text, name text, code text, is_admin boolean, is_external_viewer boolean)
