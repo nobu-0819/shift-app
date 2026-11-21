@@ -748,9 +748,9 @@ const TOTAL_SLOTS = (HOUR_END - HOUR_START) * (60 / MINS_PER_SLOT); // 28
 const JP_HOLIDAYS = new Set([
   '2026-01-01','2026-01-12','2026-02-11','2026-02-23','2026-03-20',
   '2026-04-29','2026-05-03','2026-05-04','2026-05-05','2026-05-06',
-  '2026-07-20','2026-08-11','2026-09-21','2026-09-23','2026-10-12',
-  '2026-11-03','2026-11-23','2026-12-23',
-  '2027-01-01','2027-01-11','2027-02-11','2027-02-23','2027-03-21',
+  '2026-07-20','2026-08-11','2026-09-21','2026-09-22','2026-09-23','2026-10-12',
+  '2026-11-03','2026-11-23',
+  '2027-01-01','2027-01-11','2027-02-11','2027-02-23','2027-03-21','2027-03-22',
   '2027-04-29','2027-05-03','2027-05-04','2027-05-05','2027-07-19',
   '2027-08-11','2027-09-20','2027-09-23','2027-10-11','2027-11-03','2027-11-23'
 ]);
@@ -761,6 +761,16 @@ async function loadCustomHolidays() {
   CUSTOM_HOLIDAYS = new Set((data || []).filter(r => r.type !== 'closed').map(r => r.date));
   CUSTOM_CLOSED_DAYS = new Set((data || []).filter(r => r.type === 'closed').map(r => r.date));
 }
+function staffingTargetForDate(date) {
+  const weekday = date.getDay();
+  if (weekday === 0) {
+    const monday = new Date(date);
+    monday.setDate(monday.getDate() + 1);
+    if (JP_HOLIDAYS.has(toDateStr(monday))) return 10;
+  }
+  return JP_HOLIDAYS.has(toDateStr(date)) ? 7 : STAFFING_TARGET_BY_WEEKDAY[weekday];
+}
+
 function isHolidayOrWeekend(dateStr) {
   const d = new Date(dateStr + 'T00:00:00');
   return d.getDay() === 0 || d.getDay() === 6 || JP_HOLIDAYS.has(dateStr) || CUSTOM_HOLIDAYS.has(dateStr);
@@ -2074,7 +2084,7 @@ function drawMatrixToCanvas(staffList, excludedIds) {
     const isWknd = isHolidayOrWeekend(dateStr);
     const closed = isClosedDay(dateStr);
     const dateCellLines = [`${d}日`, `（${DOW[dow]}）`,
-      closed ? '休業日' : `目安 ${STAFFING_TARGET_BY_WEEKDAY[dow]}人`];
+      closed ? '休業日' : `目安 ${staffingTargetForDate(date)}人`];
     // 開始・終了を2行に分けて表示（1行あたりの文字数が減り、狭い列でも大きな文字にできる）
     const cellsLines = closed ? visibleStaff.map(() => []) : visibleStaff.map(s => {
       const recs = (byDate[dateStr] && byDate[dateStr][s.id]) || [];
@@ -2293,7 +2303,7 @@ function renderAdminMatrixView(listEl, data, allStaff, periodStart, periodEnd) {
         }).join('');
 
     const dateCellContent = `${d}日<br>（${DOW[dow]}）<br>${closed
-      ? '休業日' : `目安 ${STAFFING_TARGET_BY_WEEKDAY[dow]}人`}`;
+      ? '休業日' : `目安 ${staffingTargetForDate(date)}人`}`;
     bodyRows += `<tr class="${rowClass}"><td class="matrix-date-col">${dateCellContent}</td>${cells}</tr>`;
   }
 
@@ -2365,7 +2375,7 @@ function renderAdminDateView(listEl, data) {
     const staffCount = Object.keys(staffMap).length;
     return `<div class="date-group">
       <div class="date-group-header"><span>${label}（希望 ${staffCount}名）</span>
-        <span>必要人数の目安 ${STAFFING_TARGET_BY_WEEKDAY[d.getDay()]}人</span></div>
+        <span>${isClosedDay(date) ? '休業日' : `必要人数の目安 ${staffingTargetForDate(d)}人`}</span></div>
       <div class="date-group-body">
         <div class="gantt-wrap"><div class="gantt-inner">
           <div style="position:relative;height:16px;margin-left:100px;margin-bottom:2px">${timeLabels.join('')}</div>
