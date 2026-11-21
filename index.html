@@ -741,6 +741,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const DOW = ['日','月','火','水','木','金','土'];
+const STAFFING_TARGET_BY_WEEKDAY = [9, 4, 4, 4, 4, 8, 11];
 const HOUR_START = 9, HOUR_END = 23, MINS_PER_SLOT = 30;
 const TOTAL_SLOTS = (HOUR_END - HOUR_START) * (60 / MINS_PER_SLOT); // 28
 
@@ -2072,7 +2073,8 @@ function drawMatrixToCanvas(staffList, excludedIds) {
     const dow = date.getDay();
     const isWknd = isHolidayOrWeekend(dateStr);
     const closed = isClosedDay(dateStr);
-    const dateCellLines = closed ? [`${d}日`, `（${DOW[dow]}）`, '休業日'] : [`${d}日`, `（${DOW[dow]}）`];
+    const dateCellLines = [`${d}日`, `（${DOW[dow]}）`,
+      closed ? '休業日' : `目安 ${STAFFING_TARGET_BY_WEEKDAY[dow]}人`];
     // 開始・終了を2行に分けて表示（1行あたりの文字数が減り、狭い列でも大きな文字にできる）
     const cellsLines = closed ? visibleStaff.map(() => []) : visibleStaff.map(s => {
       const recs = (byDate[dateStr] && byDate[dateStr][s.id]) || [];
@@ -2290,7 +2292,8 @@ function renderAdminMatrixView(listEl, data, allStaff, periodStart, periodEnd) {
           return `<td class="matrix-cell" data-staff-id="${s.id}">${text}</td>`;
         }).join('');
 
-    const dateCellContent = closed ? `${d}日<br>（${DOW[dow]}）<br>休業日` : `${d}日<br>（${DOW[dow]}）`;
+    const dateCellContent = `${d}日<br>（${DOW[dow]}）<br>${closed
+      ? '休業日' : `目安 ${STAFFING_TARGET_BY_WEEKDAY[dow]}人`}`;
     bodyRows += `<tr class="${rowClass}"><td class="matrix-date-col">${dateCellContent}</td>${cells}</tr>`;
   }
 
@@ -2361,7 +2364,8 @@ function renderAdminDateView(listEl, data) {
 
     const staffCount = Object.keys(staffMap).length;
     return `<div class="date-group">
-      <div class="date-group-header">${label}（${staffCount}名）</div>
+      <div class="date-group-header"><span>${label}（希望 ${staffCount}名）</span>
+        <span>必要人数の目安 ${STAFFING_TARGET_BY_WEEKDAY[d.getDay()]}人</span></div>
       <div class="date-group-body">
         <div class="gantt-wrap"><div class="gantt-inner">
           <div style="position:relative;height:16px;margin-left:100px;margin-bottom:2px">${timeLabels.join('')}</div>
